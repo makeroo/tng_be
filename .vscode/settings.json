@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/makeroo/tmp_thenightcage/tng_be/.venv/bin/python",
+    "python.pythonPath": ".venv/bin/python",
     "python.testing.pytestArgs": [
         "tests"
     ],
