@@ -1,0 +1,8 @@
+{
+    "python.pythonPath": "/home/makeroo/tmp_thenightcage/tng_be/.venv/bin/python",
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
