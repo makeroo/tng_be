@@ -29,6 +29,13 @@ class Player(NamedTuple):
     y: int | None
 
 
+class Phase(Enum):
+    place_start = 0
+    rotate_start = 1
+    discover_tiles = 2
+    rotate_tile = 3
+
+
 class Game(NamedTuple):
     board: Board
     tile_holder: list[Tile]
@@ -37,3 +44,5 @@ class Game(NamedTuple):
     players: list[Player]
 
     turn: int  # index in the players array
+
+    phase: Phase

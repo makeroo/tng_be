@@ -1,7 +1,7 @@
 from random import shuffle
 
 from .types import Tile, PlayerColor, Direction
-from .game import Game, Board, Cell, Player
+from .game import Game, Board, Cell, Player, Phase
 
 
 class GameFactory:
@@ -89,6 +89,7 @@ class GameFactory:
                 for color in colors
             ],
             turn=0,
+            phase=Phase.place_start,
         )
 
         return g
