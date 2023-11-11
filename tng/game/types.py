@@ -46,3 +46,16 @@ class Tile(Enum):
     four_way_passage = "four_way_passage"
 
     pit = "pit"
+
+
+for t, dirs in {
+    Tile.start: [Direction.s, Direction.w],
+    Tile.key: [Direction.n, Direction.e, Direction.s, Direction.w],
+    Tile.gate: [Direction.n, Direction.e, Direction.s, Direction.w],
+    Tile.wax_eater: [Direction.n, Direction.e, Direction.s, Direction.w],
+    Tile.straight_passage: [Direction.n, Direction.s],
+    Tile.t_passage: [Direction.e, Direction.s, Direction.w],
+    Tile.four_way_passage: [Direction.n, Direction.e, Direction.s, Direction.w],
+    Tile.pit: [Direction.n, Direction.e, Direction.s, Direction.w],
+}.items():
+    t.open_directions = dirs
