@@ -3,3 +3,4 @@ __pycache__
 /attic
 /dist
 /tng_be.egg-info
+/.coverage

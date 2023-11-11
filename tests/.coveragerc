@@ -1,0 +1,13 @@
+[run]
+branch = true
+parallel = true
+source =
+    tng.game
+[report]
+skip_empty = true
+skip_covered = true
+show_missing = true
+precision = 2
+fail_under = 0.00
+[html]
+directory = .htmlcov
