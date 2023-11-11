@@ -23,6 +23,9 @@ class Cell(NamedTuple):
 
         return self._replace(players=new_players)
 
+    def open_directions(self) -> list[Direction]:
+        return [d.rotate(self.direction) for d in self.tile.open_directions]
+
 
 class Board(NamedTuple):
     cells: list[Cell]
@@ -70,6 +73,21 @@ class Board(NamedTuple):
 
         return self._replace(cells=new_cells)
 
+    def visible_cells_from(self, x: int, y: int) -> list[Cell]:
+        cell = self.at(x, y)
+        directions = cell.open_directions()
+        r = []
+
+        for direction in directions:
+            dx, dy = direction.neighbor(x, y, self.edge_length)
+
+            dcell = self.at(dx, dy)
+
+            if dcell.tile is None:
+                r.append(dcell)
+
+        return r
+
 
 class Player(NamedTuple):
     color: PlayerColor
@@ -110,6 +128,9 @@ class Game(NamedTuple):
         """
 
         return self._replace(phase=phase)
+
+    def set_turn(self, turn: int) -> 'Game':
+        return self._replace(turn=turn)
 
     def place_tile(self, x: int, y: int, tile: Tile, direction: Direction = Direction.n) -> 'Game':
         return self._replace(board=self.board.place_tile(x, y, tile, direction))
