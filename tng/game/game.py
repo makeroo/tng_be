@@ -107,8 +107,9 @@ class Player(NamedTuple):
 class Phase(Enum):
     place_start = 'place_start'
     rotate_start = 'rotate_start'
-    discover_tiles = 'discover_tiles'
-    rotate_tile = 'rotate_tile'
+    discover_start_tiles = 'discover_start_tiles'
+    rotate_discovered_start_tile = 'rotate_discovered_start_tile'
+    # TODO: move_player
 
 
 class Game(NamedTuple):
@@ -131,6 +132,9 @@ class Game(NamedTuple):
 
     def set_turn(self, turn: int) -> 'Game':
         return self._replace(turn=turn)
+
+    def draw_tile(self):
+        return self._replace(draw_index=self.draw_index + 1)
 
     def place_tile(self, x: int, y: int, tile: Tile, direction: Direction = Direction.n) -> 'Game':
         return self._replace(board=self.board.place_tile(x, y, tile, direction))
