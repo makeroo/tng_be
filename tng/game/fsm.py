@@ -22,6 +22,8 @@ class TNGFSM:
 
         # apply
 
+        game = game.place_tile(player_status.x, player_status.y, Tile.start, move.direction)
+
         cells = game.board.visible_cells_from(player_status.x, player_status.y)
 
         if any(cell.tile is None for cell in cells):

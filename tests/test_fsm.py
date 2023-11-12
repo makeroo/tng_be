@@ -49,6 +49,7 @@ def test_rotate_start_rotate_tile():
     )
 
     assert game3.board.at(3, 4).players == [PlayerColor.blue]
+    assert game3.board.at(3, 4).direction == Direction.e
     assert game3.players[0].x == 3
     assert game3.players[0].y == 4
     assert game3.phase == Phase.discover_start_tiles
