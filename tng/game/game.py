@@ -123,6 +123,9 @@ class Game(NamedTuple):
 
     phase: Phase
 
+    last_placed_tile_x: int
+    last_placed_tile_y: int
+
     def new_phase(self, phase: Phase) -> 'Game':
         """
         FSM check is up to TNGFSM, here we take the phase as it is.
@@ -137,7 +140,11 @@ class Game(NamedTuple):
         return self._replace(draw_index=self.draw_index + 1)
 
     def place_tile(self, x: int, y: int, tile: Tile, direction: Direction = Direction.n) -> 'Game':
-        return self._replace(board=self.board.place_tile(x, y, tile, direction))
+        return self._replace(
+            board=self.board.place_tile(x, y, tile, direction),
+            last_placed_tile_x=x,
+            last_placed_tile_y=y,
+        )
 
     def move_player(self, player_idx: int, x: int, y: int) -> 'Game':
         player_status = self.players[player_idx]

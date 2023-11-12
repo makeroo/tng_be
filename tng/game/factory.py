@@ -90,6 +90,8 @@ class GameFactory:
             ],
             turn=0,
             phase=Phase.place_start,
+            last_placed_tile_x=0,
+            last_placed_tile_y=0,
         )
 
         return g
