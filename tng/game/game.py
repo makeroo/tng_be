@@ -169,3 +169,28 @@ class Game(NamedTuple):
 
         return self._replace(players=new_players)
 
+
+    def is_enlightened(self, x: int, y: int) -> bool:
+        """
+        A tile is enlightened if either a player is in it or
+        there is a player (with a lit candle) in a directly
+        connected tile.
+        """
+        cell = self.board.at(x, y)
+
+        if cell.players:
+            return True
+
+        return any(
+            p.has_light
+            for c in self.board.visible_cells_from(x, y)
+            for p in c.players
+            if self.player_status(p).has_light
+        )
+
+    def player_status(self, player: PlayerColor) -> Player:
+        for p in self.players:
+            if p.color == player:
+                return p
+
+        raise ValueError('player not found')
