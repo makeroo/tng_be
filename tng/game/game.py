@@ -152,12 +152,17 @@ class Game(NamedTuple):
 
         new_players[player_idx] = player_status._replace(x=x, y=y)
 
-        return self._replace(
+        new_game = self._replace(
             players=new_players,
             board=self.board.move_player(
                 player_status.color, player_status.x, player_status.y, x, y
             ),
         )
+
+        if player_status.x is None:
+            return new_game
+
+        return new_game._drop_tiles(player_status.x, player_status.y, player_status.has_light)
 
     def change_nerves(self, player_idx: int, delta: int) -> 'Game':
         player_status = self.players[player_idx]
@@ -169,6 +174,20 @@ class Game(NamedTuple):
 
         return self._replace(players=new_players)
 
+
+    def _drop_tiles(self, x: int, y: int, has_light: bool) -> 'Game':
+        enlighten_cells = [(x, y)]
+
+        if has_light:
+            enlighten_cells.extend(self.board.visible_cells_coords_from(x, y))
+
+        dropped_tiles = filter(
+            lambda cell_coords: not self.is_enlightened(*cell_coords), enlighten_cells
+        )
+
+        new_board = self.board.drop_tiles(dropped_tiles)
+
+        return self._replace(board=new_board)
 
     def is_enlightened(self, x: int, y: int) -> bool:
         """
