@@ -18,6 +18,10 @@ from enum import Enum
 from .types import Tile, Direction, PlayerColor
 
 
+class GameRuntimeError(Exception):
+    pass
+
+
 class Cell(NamedTuple):
     tile: Tile | None
     direction: Direction
@@ -226,4 +230,4 @@ class Game(NamedTuple):
             if p.color == player:
                 return p
 
-        raise ValueError('player not found')
+        raise GameRuntimeError('player not found')
