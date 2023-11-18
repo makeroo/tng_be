@@ -1,3 +1,11 @@
+"""
+This module implements the TNG game logic.
+
+It:
+1. validates a move
+2. make that move returning the resulting game state.
+"""
+
 from .game import Game, Phase
 from .moves import Move, PlaceTile, RotateTile
 from .types import PlayerColor, Tile, Direction

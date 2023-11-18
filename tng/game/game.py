@@ -1,4 +1,18 @@
-from typing import NamedTuple
+"""
+This module contains all TNG game data manipulation.
+
+Every method parameter is assumed to be correct, ie. already "validated"
+by the caller (eg. FSM).
+
+Assuming also that each state is "consistent" ie. produced by FSM
+while processing a valid sequence of moves, then every exception risen
+denote a bug.
+
+The game state classes are meant to be immutable. Even if
+we use lists or other mutable structures, we never change them,
+instead we recursively shallow clone them.
+"""
+
 from enum import Enum
 
 from .types import Tile, Direction, PlayerColor
