@@ -13,6 +13,7 @@ we use lists or other mutable structures, we never change them,
 instead we recursively shallow clone them.
 """
 
+from typing import NamedTuple, Iterable
 from enum import Enum
 
 from .types import Tile, Direction, PlayerColor
@@ -104,6 +105,17 @@ class Board(NamedTuple):
 
         return r
 
+    def drop_tiles(self, dropped_tiles: Iterable[tuple[int, int]]) -> 'Board':
+        new_cells = list(self.cells)
+
+        for x, y in dropped_tiles:
+            pos = y * self.edge_length + x
+
+            cell = new_cells[pos]
+            new_cells[pos] = cell._replace(tile=None)
+
+        return self._replace(cells=new_cells)
+
 
 class Player(NamedTuple):
     color: PlayerColor
@@ -192,6 +204,27 @@ class Game(NamedTuple):
 
         return self._replace(players=new_players)
 
+    def change_to_pit(self, x: int, y: int) -> 'Game':
+        return self._replace(board=self.board.place_tile(x, y, Tile.pit))
+
+    def player_falls(self, player_idx: int) -> 'Game':
+        player_status = self.players[player_idx]
+
+        new_player_status = player_status._replace(falling=True)
+
+        new_players = list(self.players)
+        new_players[player_idx] = new_player_status
+
+        new_board = self.board.move_player(
+            player_status.color, player_status.x, player_status.y, None, None
+        )
+
+        new_game = self._replace(
+            board=new_board,
+            players=new_players,
+        )
+
+        return new_game._drop_tiles(player_status.x, player_status.y, player_status.has_light)
 
     def _drop_tiles(self, x: int, y: int, has_light: bool) -> 'Game':
         enlighten_cells = [(x, y)]
