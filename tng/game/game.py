@@ -72,6 +72,9 @@ class Board(NamedTuple):
         return self._replace(cells=new_cells)
 
     def visible_cells_from(self, x: int, y: int) -> list[Cell]:
+        return [self.at(x, y) for x, y in self.visible_cells_coords_from(x, y)]
+
+    def visible_cells_coords_from(self, x: int, y: int) -> list[tuple[int, int]]:
         cell = self.at(x, y)
         directions = cell.open_directions()
         r = []
