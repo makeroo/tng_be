@@ -82,10 +82,7 @@ class Board(NamedTuple):
         for direction in directions:
             dx, dy = direction.neighbor(x, y, self.edge_length)
 
-            dcell = self.at(dx, dy)
-
-            if dcell.tile is None:
-                r.append(dcell)
+            r.append((dx, dy))
 
         return r
 
