@@ -53,6 +53,25 @@ class Tile(Enum):
     pit = "pit"
 
 
+Tile.start.is_crumbling = True
+Tile.key.is_crumbling = True
+Tile.gate.is_crumbling = False
+Tile.wax_eater.is_crumbling = False
+Tile.straight_passage.is_crumbling = True
+Tile.t_passage.is_crumbling = False
+Tile.four_way_passage.is_crumbling = False
+Tile.pit.is_crumbling = False
+
+Tile.start.is_monster = False
+Tile.key.is_monster = False
+Tile.gate.is_monster = False
+Tile.wax_eater.is_monster = True
+Tile.straight_passage.is_monster = False
+Tile.t_passage.is_monster = False
+Tile.four_way_passage.is_monster = False
+Tile.pit.is_monster = False
+
+
 for t, dirs in {
     Tile.start: [Direction.s, Direction.w],
     Tile.key: [Direction.n, Direction.e, Direction.s, Direction.w],
