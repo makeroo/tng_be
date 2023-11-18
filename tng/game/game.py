@@ -10,9 +10,7 @@ class Cell(NamedTuple):
     players: list[PlayerColor]
 
     def remove_player(self, player_color: PlayerColor) -> 'Cell':
-        new_players = [
-            player_status for player_status in self.players if player_status.color != player_color
-        ]
+        new_players = [player for player in self.players if player != player_color]
 
         return self._replace(players=new_players)
 
@@ -109,7 +107,7 @@ class Phase(Enum):
     rotate_start = 'rotate_start'
     discover_start_tiles = 'discover_start_tiles'
     rotate_discovered_start_tile = 'rotate_discovered_start_tile'
-    # TODO: move_player
+    move_player = 'move_player'
 
 
 class Game(NamedTuple):

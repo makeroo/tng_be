@@ -35,6 +35,11 @@ neighbors = {
     Direction.w: (-1, 0),
 }
 
+Direction.n.connected_to = Direction.s
+Direction.e.connected_to = Direction.w
+Direction.s.connected_to = Direction.n
+Direction.w.connected_to = Direction.e
+
 
 class Tile(Enum):
     start = "start"

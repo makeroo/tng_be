@@ -10,7 +10,11 @@ class TNGFSM:
         return handler(game, move.player, move.param)
 
     def place_start_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
-        return self._apply_place_tile(game, player, move, Tile.start).new_phase(Phase.rotate_start)
+        return (
+            self._apply_place_tile(game, player, move, Tile.start)
+            .new_phase(Phase.rotate_start)
+            .move_player(game.turn, move.x, move.y)
+        )
 
     def rotate_start_rotate_tile(self, game: Game, player: PlayerColor, move: RotateTile) -> Game:
         # validate move
@@ -48,6 +52,45 @@ class TNGFSM:
             .draw_tile()
         )
 
+    def rotate_discovered_start_tile_rotate_tile(
+        self, game: Game, player: PlayerColor, move: RotateTile
+    ) -> Game:
+        # validate move
+
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise ValueError('not player turn')
+
+        rotated_cell = game.board.at(game.last_placed_tile_x, game.last_placed_tile_y)
+        player_cell = game.board.at(player_status.x, player_status.y)
+
+        from_dirs = player_cell.open_directions()
+
+        rotated_cell = rotated_cell._replace(direction=move.direction)
+
+        to_dirs = rotated_cell.open_directions()
+
+        if not any(fd.connected_to is td for fd in from_dirs for td in to_dirs):
+            raise ValueError('not_connected')
+
+        # apply
+
+        game = game.place_tile(
+            game.last_placed_tile_x, game.last_placed_tile_y, rotated_cell.tile, move.direction
+        )
+
+        cells = game.board.visible_cells_from(player_status.x, player_status.y)
+
+        if any(cell.tile is None for cell in cells):
+            return game.new_phase(Phase.discover_start_tiles)
+
+        elif game.turn + 1 == len(game.players):
+            return game.new_phase(Phase.move_player).set_turn(0)
+
+        else:
+            return game.new_phase(Phase.place_start).set_turn(game.turn + 1)
+
     def _apply_place_tile(
         self, game: Game, player: PlayerColor, move: PlaceTile, tile: Tile
     ) -> Game:
@@ -75,6 +118,4 @@ class TNGFSM:
 
         # apply
 
-        return game.place_tile(move.x, move.y, tile, Direction.n).move_player(
-            game.turn, move.x, move.y
-        )
+        return game.place_tile(move.x, move.y, tile, Direction.n)
