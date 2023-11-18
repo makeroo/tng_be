@@ -83,6 +83,7 @@ class GameFactory:
                     has_key=False,
                     nerves=1,
                     has_light=True,
+                    falling=False,
                     x=None,
                     y=None,
                 )

@@ -93,6 +93,7 @@ class Player(NamedTuple):
     has_key: bool
     nerves: int
     has_light: bool
+    falling: bool
 
     # player position:
     # both None -> initial turn, not yet on map
