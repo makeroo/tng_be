@@ -9,6 +9,8 @@ from .types import PlayerColor, Direction
 class MoveType(str, Enum):
     place_tile = "place_tile"
     rotate_tile = "rotate_tile"
+    stay = "stay"
+    walk = "walk"
 
 
 class PlaceTile(BaseModel):
@@ -19,6 +21,15 @@ class PlaceTile(BaseModel):
 
 class RotateTile(BaseModel):
     move: Literal[MoveType.rotate_tile]
+    direction: Direction
+
+
+class Stay(BaseModel):
+    move: Literal[MoveType.stay]
+
+
+class Walk(BaseModel):
+    move: Literal[MoveType.stay]
     direction: Direction
 
 
