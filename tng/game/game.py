@@ -158,3 +158,14 @@ class Game(NamedTuple):
                 player_status.color, player_status.x, player_status.y, x, y
             ),
         )
+
+    def change_nerves(self, player_idx: int, delta: int) -> 'Game':
+        player_status = self.players[player_idx]
+
+        player_status = player_status._replace(nerves=player_status.nerves + delta)
+
+        new_players = list(self.players)
+        new_players[player_idx] = player_status
+
+        return self._replace(players=new_players)
+
