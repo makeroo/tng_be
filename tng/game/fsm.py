@@ -11,6 +11,10 @@ from .moves import Move, PlaceTile, RotateTile
 from .types import PlayerColor, Tile, Direction
 
 
+class IllegalMove(ValueError):
+    pass
+
+
 class TNGFSM:
     def apply(self, game: Game, move: Move) -> Game:
         handler = getattr(self, f'{game.phase.value}_{move.param.move}')
@@ -30,7 +34,7 @@ class TNGFSM:
         player_status = game.players[game.turn]
 
         if player_status.color != player:
-            raise ValueError('not player turn')
+            raise IllegalMove('not player turn')
 
         # apply
 
@@ -68,7 +72,7 @@ class TNGFSM:
         player_status = game.players[game.turn]
 
         if player_status.color != player:
-            raise ValueError('not player turn')
+            raise IllegalMove('not player turn')
 
         rotated_cell = game.board.at(game.last_placed_tile_x, game.last_placed_tile_y)
         player_cell = game.board.at(player_status.x, player_status.y)
@@ -80,7 +84,7 @@ class TNGFSM:
         to_dirs = rotated_cell.open_directions()
 
         if not any(fd.connected_to is td for fd in from_dirs for td in to_dirs):
-            raise ValueError('not_connected')
+            raise IllegalMove('not_connected')
 
         # apply
 
@@ -109,20 +113,20 @@ class TNGFSM:
         edge_length = game.board.edge_length
 
         if x < 0 or x >= edge_length:
-            raise ValueError('x out of board')
+            raise IllegalMove('x out of board')
 
         if y < 0 or y >= edge_length:
-            raise ValueError('y out of board')
+            raise IllegalMove('y out of board')
 
         player_status = game.players[game.turn]
 
         if player_status.color != player:
-            raise ValueError('not player turn')
+            raise IllegalMove('not player turn')
 
         cell = game.board.at(move.x, move.y)
 
         if cell.tile is not None:
-            raise ValueError('tile not empty')
+            raise IllegalMove('tile not empty')
 
         # apply
 
