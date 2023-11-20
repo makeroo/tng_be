@@ -1,6 +1,6 @@
 from random import shuffle
 
-from .types import Tile, PlayerColor, Direction
+from .types import Tile, PlayerColor, Direction, Position
 from .game import Game, Board, Cell, Player, Phase
 
 
@@ -84,15 +84,13 @@ class GameFactory:
                     nerves=1,
                     has_light=True,
                     falling=False,
-                    x=None,
-                    y=None,
+                    pos=None,
                 )
                 for color in colors
             ],
             turn=0,
             phase=Phase.place_start,
-            last_placed_tile_x=0,
-            last_placed_tile_y=0,
+            last_placed_tile_pos=Position(0, 0),
         )
 
         return g

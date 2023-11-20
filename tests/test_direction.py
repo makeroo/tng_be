@@ -1,4 +1,4 @@
-from tng.game.types import Direction
+from tng.game.types import Direction, Position
 
 
 def test_rotate():
@@ -8,6 +8,6 @@ def test_rotate():
 
 
 def test_neighbor():
-    assert Direction.n.neighbor(0, 0, 6) == (0, 5)
+    assert Direction.n.neighbor(Position(0, 0), 6) == Position(0, 5)
 
-    assert Direction.e.neighbor(3, 4, 6) == (4, 4)
+    assert Direction.e.neighbor(Position(3, 4), 6) == Position(4, 4)

@@ -6,7 +6,7 @@ It:
 2. make that move returning the resulting game state.
 """
 
-from .game import Game, Phase
+from .game import Game, Phase, GameRuntimeError
 from .moves import Move, PlaceTile, RotateTile
 from .types import PlayerColor, Tile, Direction
 
@@ -38,9 +38,12 @@ class TNGFSM:
 
         # apply
 
-        game = game.place_tile(player_status.x, player_status.y, Tile.start, move.direction)
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
 
-        cells = game.board.visible_cells_from(player_status.x, player_status.y)
+        game = game.place_tile(player_status.pos, Tile.start, move.direction)
+
+        cells = game.board.visible_cells_from(player_status.pos)
 
         if any(cell.tile is None for cell in cells):
             return game.new_phase(Phase.discover_start_tiles)
@@ -74,8 +77,11 @@ class TNGFSM:
         if player_status.color != player:
             raise IllegalMove('not player turn')
 
-        rotated_cell = game.board.at(game.last_placed_tile_x, game.last_placed_tile_y)
-        player_cell = game.board.at(player_status.x, player_status.y)
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
+
+        rotated_cell = game.board.at(game.last_placed_tile_pos)
+        player_cell = game.board.at(player_status.pos)
 
         from_dirs = player_cell.open_directions()
 
@@ -88,11 +94,12 @@ class TNGFSM:
 
         # apply
 
-        game = game.place_tile(
-            game.last_placed_tile_x, game.last_placed_tile_y, rotated_cell.tile, move.direction
-        )
+        if rotated_cell.tile is None:
+            raise GameRuntimeError('empty type')
 
-        cells = game.board.visible_cells_from(player_status.x, player_status.y)
+        game = game.place_tile(game.last_placed_tile_pos, rotated_cell.tile, move.direction)
+
+        cells = game.board.visible_cells_from(player_status.pos)
 
         if any(cell.tile is None for cell in cells):
             return game.new_phase(Phase.discover_start_tiles)
@@ -108,8 +115,8 @@ class TNGFSM:
     ) -> Game:
         # validate move
 
-        x = move.x
-        y = move.y
+        x = move.pos.x
+        y = move.pos.y
         edge_length = game.board.edge_length
 
         if x < 0 or x >= edge_length:
@@ -123,11 +130,11 @@ class TNGFSM:
         if player_status.color != player:
             raise IllegalMove('not player turn')
 
-        cell = game.board.at(move.x, move.y)
+        cell = game.board.at(move.pos)
 
         if cell.tile is not None:
             raise IllegalMove('tile not empty')
 
         # apply
 
-        return game.place_tile(move.x, move.y, tile, Direction.n)
+        return game.place_tile(move.pos, tile, Direction.n)

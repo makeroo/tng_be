@@ -1,6 +1,6 @@
 from tng.game.factory import GameFactory
 from tng.game.fsm import TNGFSM
-from tng.game.types import PlayerColor, Direction, Tile
+from tng.game.types import PlayerColor, Direction, Tile, Position
 from tng.game.moves import Move, PlaceTile, MoveType, RotateTile
 from tng.game.game import Phase
 
@@ -15,16 +15,18 @@ def test_place_start_place_tile():
     fsm = TNGFSM()
 
     game2 = fsm.apply(
-        game, Move(player=PlayerColor.blue, param=PlaceTile(move=MoveType.place_tile, x=3, y=4))
+        game,
+        Move(
+            player=PlayerColor.blue,
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=4)),
+        ),
     )
 
-    assert game2.board.at(3, 4).players == [PlayerColor.blue]
-    assert game2.players[0].x == 3
-    assert game2.players[0].y == 4
+    assert game2.board.at(Position(3, 4)).players == [PlayerColor.blue]
+    assert game2.players[0].pos == Position(3, 4)
 
-    assert game.board.at(3, 4).players == []
-    assert game.players[0].x is None
-    assert game.players[0].y is None
+    assert game.board.at(Position(3, 4)).players == []
+    assert game.players[0].pos is None
 
 
 def test_rotate_start_rotate_tile():
@@ -37,7 +39,11 @@ def test_rotate_start_rotate_tile():
     fsm = TNGFSM()
 
     game2 = fsm.apply(
-        game, Move(player=PlayerColor.blue, param=PlaceTile(move=MoveType.place_tile, x=3, y=4))
+        game,
+        Move(
+            player=PlayerColor.blue,
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=4)),
+        ),
     )
 
     game3 = fsm.apply(
@@ -48,10 +54,9 @@ def test_rotate_start_rotate_tile():
         ),
     )
 
-    assert game3.board.at(3, 4).players == [PlayerColor.blue]
-    assert game3.board.at(3, 4).direction == Direction.e
-    assert game3.players[0].x == 3
-    assert game3.players[0].y == 4
+    assert game3.board.at(Position(3, 4)).players == [PlayerColor.blue]
+    assert game3.board.at(Position(3, 4)).direction == Direction.e
+    assert game3.players[0].pos == Position(3, 4)
     assert game3.phase == Phase.discover_start_tiles
 
 
@@ -65,7 +70,11 @@ def test_rotate_discovered_start_tile_rotate_tile():
     fsm = TNGFSM()
 
     game2 = fsm.apply(
-        game, Move(player=PlayerColor.blue, param=PlaceTile(move=MoveType.place_tile, x=3, y=4))
+        game,
+        Move(
+            player=PlayerColor.blue,
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=4)),
+        ),
     )
 
     game3 = fsm.apply(
@@ -83,18 +92,16 @@ def test_rotate_discovered_start_tile_rotate_tile():
         game3,
         Move(
             player=PlayerColor.blue,
-            param=PlaceTile(move=MoveType.place_tile, x=3, y=3),
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=3)),
         ),
     )
 
-    assert game4.board.at(3, 4).players == [PlayerColor.blue]
-    assert game4.players[0].x == 3
-    assert game4.players[0].y == 4
-    assert game4.last_placed_tile_x == 3
-    assert game4.last_placed_tile_y == 3
+    assert game4.board.at(Position(3, 4)).players == [PlayerColor.blue]
+    assert game4.players[0].pos == Position(3, 4)
+    assert game4.last_placed_tile_pos == Position(3, 3)
     assert game4.draw_index == 1
     assert game4.phase == Phase.rotate_discovered_start_tile
-    assert game4.board.at(3, 3).tile is Tile.straight_passage
+    assert game4.board.at(Position(3, 3)).tile is Tile.straight_passage
 
     game5 = fsm.apply(
         game4,
@@ -105,7 +112,6 @@ def test_rotate_discovered_start_tile_rotate_tile():
     )
 
     assert game5.phase == Phase.discover_start_tiles
-    assert game5.board.at(3, 3).direction == Direction.s
-    assert game5.board.at(3, 4).players == [PlayerColor.blue]
-    assert game5.players[0].x == 3
-    assert game5.players[0].y == 4
+    assert game5.board.at(Position(3, 3)).direction == Direction.s
+    assert game5.board.at(Position(3, 4)).players == [PlayerColor.blue]
+    assert game5.players[0].pos == Position(3, 4)

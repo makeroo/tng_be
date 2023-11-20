@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from .types import PlayerColor, Direction
+from .types import PlayerColor, Direction, Position
 
 
 class MoveType(str, Enum):
@@ -15,8 +15,7 @@ class MoveType(str, Enum):
 
 class PlaceTile(BaseModel):
     move: Literal[MoveType.place_tile]
-    x: int
-    y: int
+    pos: Position
 
 
 class RotateTile(BaseModel):

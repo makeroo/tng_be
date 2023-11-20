@@ -16,7 +16,7 @@ instead we recursively shallow clone them.
 from typing import NamedTuple, Iterable
 from enum import Enum
 
-from .types import Tile, Direction, PlayerColor
+from .types import Tile, Direction, PlayerColor, Position
 
 
 class GameRuntimeError(Exception):
@@ -48,60 +48,59 @@ class Board(NamedTuple):
     cells: list[Cell]
     edge_length: int  # can be 6 (up to 4 players) or 7 (5 players)
 
-    def at(self, x: int, y: int) -> Cell:
-        return self.cells[y * self.edge_length + x]
+    def at(self, pos: Position) -> Cell:
+        return self.cells[pos.idx(self.edge_length)]
 
-    def place_tile(self, x: int, y: int, tile: Tile, direction: Direction = Direction.n) -> 'Game':
+    def place_tile(self, pos: Position, tile: Tile, direction: Direction = Direction.n) -> 'Board':
         new_cells = list(self.cells)
 
-        pos = y * self.edge_length + x
+        idx = pos.idx(self.edge_length)
 
-        orig_cell = new_cells[pos]
+        orig_cell = new_cells[idx]
 
         new_cell = orig_cell._replace(
             tile=tile,
             direction=direction,
         )
 
-        new_cells[pos] = new_cell
+        new_cells[idx] = new_cell
 
         return self._replace(cells=new_cells)
 
     def move_player(
         self,
         player_color: PlayerColor,
-        from_x: int | None,
-        from_y: int | None,
-        to_x: int,
-        to_y: int,
+        from_pos: Position | None,
+        to_pos: Position | None,
     ) -> 'Board':
         new_cells = list(self.cells)
 
-        if from_x is not None:
-            old_pos = from_y * self.edge_length + from_x
-            old_cell = self.cells[old_pos]
+        if from_pos is not None:
+            old_idx = from_pos.idx(self.edge_length)
+            old_cell = self.cells[old_idx]
 
-            new_cells[old_pos] = old_cell.remove_player(player_color)
+            new_cells[old_idx] = old_cell.remove_player(player_color)
 
-        new_pos = to_y * self.edge_length + to_x
-        new_cell = self.cells[new_pos]
+        if to_pos is not None:
+            new_idx = to_pos.idx(self.edge_length)
+            new_cell = self.cells[new_idx]
 
-        new_cells[new_pos] = new_cell.add_player(player_color)
+            new_cells[new_idx] = new_cell.add_player(player_color)
 
         return self._replace(cells=new_cells)
 
-    def visible_cells_from(self, x: int, y: int) -> list[Cell]:
-        return [self.at(x, y) for x, y in self.visible_cells_coords_from(x, y)]
+    def visible_cells_from(self, pos: Position) -> list[Cell]:
+        return [self.at(pos) for pos in self.visible_cells_coords_from(pos)]
 
-    def visible_cells_coords_from(self, x: int, y: int) -> list[tuple[int, int]]:
-        cell = self.at(x, y)
+    def visible_cells_coords_from(self, pos: Position) -> list[Position]:
+        cell = self.at(pos)
         directions = cell.open_directions()
         r = []
 
         for direction in directions:
-            dx, dy = direction.neighbor(x, y, self.edge_length)
+            dx, dy = direction.neighbor(pos, self.edge_length)
 
-            r.append((dx, dy))
+            r.append(Position(dx, dy))
 
         return r
 
@@ -116,6 +115,9 @@ class Board(NamedTuple):
 
         return self._replace(cells=new_cells)
 
+    def dest_coords(self, pos: Position, direction: Direction) -> Position:
+        return direction.neighbor(pos, self.edge_length)
+
 
 class Player(NamedTuple):
     color: PlayerColor
@@ -129,8 +131,7 @@ class Player(NamedTuple):
     # both None -> initial turn, not yet on map
     # both int -> on map
     # only one int -> falling
-    x: int | None
-    y: int | None
+    pos: Position | None
 
 
 class Phase(Enum):
@@ -152,8 +153,7 @@ class Game(NamedTuple):
 
     phase: Phase
 
-    last_placed_tile_x: int
-    last_placed_tile_y: int
+    last_placed_tile_pos: Position
 
     def new_phase(self, phase: Phase) -> 'Game':
         """
@@ -168,31 +168,35 @@ class Game(NamedTuple):
     def draw_tile(self):
         return self._replace(draw_index=self.draw_index + 1)
 
-    def place_tile(self, x: int, y: int, tile: Tile, direction: Direction = Direction.n) -> 'Game':
+    def place_tile(self, pos: Position, tile: Tile, direction: Direction = Direction.n) -> 'Game':
         return self._replace(
-            board=self.board.place_tile(x, y, tile, direction),
-            last_placed_tile_x=x,
-            last_placed_tile_y=y,
+            board=self.board.place_tile(pos, tile, direction),
+            last_placed_tile_pos=pos,
         )
 
-    def move_player(self, player_idx: int, x: int, y: int) -> 'Game':
+    def move_player(self, player_idx: int, pos: Position) -> 'Game':
         player_status = self.players[player_idx]
+
+        new_player_status = player_status._replace(pos=pos)
+
+        dest_cell = self.board.at(pos)
+
+        if dest_cell.tile is Tile.pit:
+            new_player_status = new_player_status._replace(falling=True)
 
         new_players = list(self.players)
 
-        new_players[player_idx] = player_status._replace(x=x, y=y)
+        new_players[player_idx] = new_player_status
 
         new_game = self._replace(
             players=new_players,
-            board=self.board.move_player(
-                player_status.color, player_status.x, player_status.y, x, y
-            ),
+            board=self.board.move_player(player_status.color, player_status.pos, pos),
         )
 
-        if player_status.x is None:
+        if player_status.pos is None:
             return new_game
 
-        return new_game._drop_tiles(player_status.x, player_status.y, player_status.has_light)
+        return new_game._drop_tiles(player_status.pos, player_status.has_light)
 
     def change_nerves(self, player_idx: int, delta: int) -> 'Game':
         player_status = self.players[player_idx]
@@ -204,8 +208,8 @@ class Game(NamedTuple):
 
         return self._replace(players=new_players)
 
-    def change_to_pit(self, x: int, y: int) -> 'Game':
-        return self._replace(board=self.board.place_tile(x, y, Tile.pit))
+    def change_to_pit(self, pos: Position) -> 'Game':
+        return self._replace(board=self.board.place_tile(pos, Tile.pit))
 
     def player_falls(self, player_idx: int) -> 'Game':
         player_status = self.players[player_idx]
@@ -215,47 +219,47 @@ class Game(NamedTuple):
         new_players = list(self.players)
         new_players[player_idx] = new_player_status
 
-        new_board = self.board.move_player(
-            player_status.color, player_status.x, player_status.y, None, None
-        )
+        new_board = self.board.move_player(player_status.color, player_status.pos, None)
 
         new_game = self._replace(
             board=new_board,
             players=new_players,
         )
 
-        return new_game._drop_tiles(player_status.x, player_status.y, player_status.has_light)
+        if player_status.pos is None:
+            raise GameRuntimeError('player not placed')
 
-    def _drop_tiles(self, x: int, y: int, has_light: bool) -> 'Game':
-        enlighten_cells = [(x, y)]
+        return new_game._drop_tiles(player_status.pos, player_status.has_light)
+
+    def _drop_tiles(self, pos: Position, has_light: bool) -> 'Game':
+        enlighten_cells = [pos]
 
         if has_light:
-            enlighten_cells.extend(self.board.visible_cells_coords_from(x, y))
+            enlighten_cells.extend(self.board.visible_cells_coords_from(pos))
 
         dropped_tiles = filter(
-            lambda cell_coords: not self.is_enlightened(*cell_coords), enlighten_cells
+            lambda cell_coords: not self.is_enlightened(cell_coords), enlighten_cells
         )
 
         new_board = self.board.drop_tiles(dropped_tiles)
 
         return self._replace(board=new_board)
 
-    def is_enlightened(self, x: int, y: int) -> bool:
+    def is_enlightened(self, pos: Position) -> bool:
         """
         A tile is enlightened if either a player is in it or
         there is a player (with a lit candle) in a directly
         connected tile.
         """
-        cell = self.board.at(x, y)
+        cell = self.board.at(pos)
 
         if cell.players:
             return True
 
         return any(
-            p.has_light
-            for c in self.board.visible_cells_from(x, y)
+            self.player_status(p).has_light
+            for c in self.board.visible_cells_from(pos)
             for p in c.players
-            if self.player_status(p).has_light
         )
 
     def player_status(self, player: PlayerColor) -> Player:
