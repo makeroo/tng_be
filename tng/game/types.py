@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import NamedTuple
 
 
 class PlayerColor(Enum):
@@ -7,6 +8,17 @@ class PlayerColor(Enum):
     green = "green"
     blue = "blue"
     purple = "purple"
+
+
+class Position(NamedTuple):
+    x: int
+    y: int
+
+    def idx(self, edge_length: int) -> int:
+        return self.y * edge_length + self.x
+
+    def add(self, dx: int, dy: int, edge_length: int) -> 'Position':
+        return Position((self.x + dx) % edge_length, (self.y + dy) % edge_length)
 
 
 class Direction(Enum):
@@ -20,10 +32,10 @@ class Direction(Enum):
 
         return all_directions[new_index]
 
-    def neighbor(self, x: int, y: int, edge_length: int) -> tuple[int, int]:
+    def neighbor(self, pos: Position, edge_length: int) -> Position:
         dx, dy = neighbors[self]
 
-        return (x + dx) % edge_length, (y + dy) % edge_length
+        return pos.add(dx, dy, edge_length)
 
 
 all_directions = [d for d in Direction]
