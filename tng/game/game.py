@@ -11,6 +11,16 @@ denote a bug.
 The game state classes are meant to be immutable. Even if
 we use lists or other mutable structures, we never change them,
 instead we recursively shallow clone them.
+
+The resulting state is coherent from that class POV.
+Example:
+* Board.move_player removes the player from the starting cell
+  and adds to the destination cell.
+  But Board doesn't know about player state so if the dest cell
+  is a pit, it's a Game concern to change they state to falling.
+
+Note: an exception to this principle are the turn/phase flags.
+They are managed by FSM which uses several Game calls.
 """
 
 from typing import NamedTuple, Iterable
