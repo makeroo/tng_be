@@ -41,6 +41,9 @@ class Cell(NamedTuple):
         return self._replace(players=new_players)
 
     def open_directions(self) -> list[Direction]:
+        if self.tile is None:
+            raise GameRuntimeError('no tile')
+
         return [d.rotate(self.direction) for d in open_directions[self.tile]]
 
 

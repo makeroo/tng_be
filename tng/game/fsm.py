@@ -25,7 +25,7 @@ class TNGFSM:
         return (
             self._apply_place_tile(game, player, move, Tile.start)
             .new_phase(Phase.rotate_start)
-            .move_player(game.turn, move.x, move.y)
+            .move_player(game.turn, move.pos)
         )
 
     def rotate_start_rotate_tile(self, game: Game, player: PlayerColor, move: RotateTile) -> Game:
