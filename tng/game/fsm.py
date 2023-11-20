@@ -95,7 +95,7 @@ class TNGFSM:
         # apply
 
         if rotated_cell.tile is None:
-            raise GameRuntimeError('empty type')
+            raise GameRuntimeError('empty cell')
 
         game = game.place_tile(game.last_placed_tile_pos, rotated_cell.tile, move.direction)
 
