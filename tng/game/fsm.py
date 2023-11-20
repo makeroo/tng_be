@@ -8,7 +8,7 @@ It:
 
 from .game import Game, Phase, GameRuntimeError
 from .moves import Move, PlaceTile, RotateTile
-from .types import PlayerColor, Tile, Direction
+from .types import PlayerColor, Tile, Direction, connected_to, is_crumbling, is_monster
 
 
 class IllegalMove(ValueError):
@@ -89,7 +89,7 @@ class TNGFSM:
 
         to_dirs = rotated_cell.open_directions()
 
-        if not any(fd.connected_to is td for fd in from_dirs for td in to_dirs):
+        if not any(connected_to[fd] is td for fd in from_dirs for td in to_dirs):
             raise IllegalMove('not_connected')
 
         # apply

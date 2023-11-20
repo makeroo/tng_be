@@ -16,7 +16,7 @@ instead we recursively shallow clone them.
 from typing import NamedTuple, Iterable
 from enum import Enum
 
-from .types import Tile, Direction, PlayerColor, Position
+from .types import Tile, Direction, PlayerColor, Position, open_directions
 
 
 class GameRuntimeError(Exception):
@@ -41,7 +41,7 @@ class Cell(NamedTuple):
         return self._replace(players=new_players)
 
     def open_directions(self) -> list[Direction]:
-        return [d.rotate(self.direction) for d in self.tile.open_directions]
+        return [d.rotate(self.direction) for d in open_directions[self.tile]]
 
 
 class Board(NamedTuple):

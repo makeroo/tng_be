@@ -47,10 +47,12 @@ neighbors = {
     Direction.w: (-1, 0),
 }
 
-Direction.n.connected_to = Direction.s
-Direction.e.connected_to = Direction.w
-Direction.s.connected_to = Direction.n
-Direction.w.connected_to = Direction.e
+connected_to = {
+    Direction.n: Direction.s,
+    Direction.e: Direction.w,
+    Direction.s: Direction.n,
+    Direction.w: Direction.e,
+}
 
 
 class Tile(Enum):
@@ -65,26 +67,29 @@ class Tile(Enum):
     pit = "pit"
 
 
-Tile.start.is_crumbling = True
-Tile.key.is_crumbling = True
-Tile.gate.is_crumbling = False
-Tile.wax_eater.is_crumbling = False
-Tile.straight_passage.is_crumbling = True
-Tile.t_passage.is_crumbling = False
-Tile.four_way_passage.is_crumbling = False
-Tile.pit.is_crumbling = False
+is_crumbling = {
+    Tile.start: True,
+    Tile.key: True,
+    Tile.gate: False,
+    Tile.wax_eater: False,
+    Tile.straight_passage: True,
+    Tile.t_passage: False,
+    Tile.four_way_passage: False,
+    Tile.pit: False,
+}
 
-Tile.start.is_monster = False
-Tile.key.is_monster = False
-Tile.gate.is_monster = False
-Tile.wax_eater.is_monster = True
-Tile.straight_passage.is_monster = False
-Tile.t_passage.is_monster = False
-Tile.four_way_passage.is_monster = False
-Tile.pit.is_monster = False
+is_monster = {
+    Tile.start: False,
+    Tile.key: False,
+    Tile.gate: False,
+    Tile.wax_eater: True,
+    Tile.straight_passage: False,
+    Tile.t_passage: False,
+    Tile.four_way_passage: False,
+    Tile.pit: False,
+}
 
-
-for t, dirs in {
+open_directions = {
     Tile.start: [Direction.s, Direction.w],
     Tile.key: [Direction.n, Direction.e, Direction.s, Direction.w],
     Tile.gate: [Direction.n, Direction.e, Direction.s, Direction.w],
@@ -93,5 +98,4 @@ for t, dirs in {
     Tile.t_passage: [Direction.e, Direction.s, Direction.w],
     Tile.four_way_passage: [Direction.n, Direction.e, Direction.s, Direction.w],
     Tile.pit: [Direction.n, Direction.e, Direction.s, Direction.w],
-}.items():
-    t.open_directions = dirs
+}

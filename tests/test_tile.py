@@ -1,5 +1,5 @@
-from tng.game.types import Tile, Direction
+from tng.game.types import Tile, Direction, open_directions
 
 
 def test_open_directions():
-    assert Tile.start.open_directions == [Direction.s, Direction.w]
+    assert open_directions[Tile.start] == [Direction.s, Direction.w]
