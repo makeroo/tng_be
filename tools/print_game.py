@@ -1,4 +1,4 @@
-from tng.game.types import Direction, Tile
+from tng.game.types import Direction, Tile, FallDirection
 from tng.game.game import Board, Cell, Game, Player
 from tng.game.moves import Move, MoveType
 
@@ -109,7 +109,17 @@ def print_player(p: Player) -> str:
         if p.pos is None:
             raise Exception('falling player without pos')
 
-        r.append(f'falling from {p.pos.x},{p.pos.y}')
+        if p.fall_direction is None:
+            r.append(f'falling from {p.pos.x},{p.pos.y}')
+
+        elif p.fall_direction is FallDirection.column:
+            r.append(f'falling on column {p.pos.y}')
+
+        elif p.fall_direction is FallDirection.row:
+            r.append(f'falling on row {p.pos.x}')
+
+        else:
+            raise Exception(f'unknown fall direction {p.fall_direction}')
 
     if p.has_key:
         r.append('key')
@@ -150,6 +160,14 @@ def print_move(m: Move) -> str:
     elif m.param.move == MoveType.walk:
         walk = m.param
         t = f'walk {walk.direction.value}'
+
+    elif m.param.move == MoveType.fall:
+        fall = m.param
+        t = f'fall {fall.direction.value}'
+
+    elif m.param.move == MoveType.drop:
+        drop = m.param
+        t = f'drop on {drop.place}'
 
     else:
         raise ValueError
