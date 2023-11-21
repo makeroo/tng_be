@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from tng.game.factory import GameFactory
 from tng.game.fsm import TNGFSM
 from tng.game.types import PlayerColor, Direction, Position
-from tng.game.moves import Move, PlaceTile, MoveType, RotateTile, Walk
+from tng.game.moves import Move, PlaceTile, MoveType, RotateTile, Walk, Stay
 from tng.game.game import Game
 
 from print_game import print_game, print_move
@@ -117,6 +117,14 @@ def run_sample_match():
         Move(  # 21
             player=PlayerColor.blue,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=1, y=4)),
+        ),
+        Move(  # 22
+            player=PlayerColor.blue,
+            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
+        ),
+        Move(  # 23
+            player=PlayerColor.red,
+            param=Stay(move=MoveType.stay),
         ),
     ]
 
