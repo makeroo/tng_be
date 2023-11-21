@@ -38,6 +38,11 @@ class Direction(Enum):
         return pos.add(dx, dy, edge_length)
 
 
+class FallDirection(Enum):
+    row = 'row'
+    column = 'column'
+
+
 all_directions = [d for d in Direction]
 direction_index = {d: idx for idx, d in enumerate(Direction)}
 neighbors = {

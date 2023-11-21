@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from .types import PlayerColor, Direction, Position
+from .types import PlayerColor, Direction, Position, FallDirection
 
 
 class MoveType(str, Enum):
@@ -11,6 +11,8 @@ class MoveType(str, Enum):
     rotate_tile = "rotate_tile"
     stay = "stay"
     walk = "walk"
+    fall = "fall"  # ie. select either row or column
+    drop = "drop"  # ie. return on board
 
 
 class PlaceTile(BaseModel):
@@ -32,6 +34,16 @@ class Walk(BaseModel):
     direction: Direction
 
 
+class Fall(BaseModel):
+    move: Literal[MoveType.fall]
+    direction: FallDirection
+
+
+class Drop(BaseModel):
+    move: Literal[MoveType.drop]
+    place: int
+
+
 class Move(BaseModel):
     player: PlayerColor
-    param: PlaceTile | RotateTile | Stay | Walk = Field(discriminator='move')
+    param: PlaceTile | RotateTile | Stay | Walk | Fall | Drop = Field(discriminator='move')
