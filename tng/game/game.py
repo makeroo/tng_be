@@ -253,8 +253,14 @@ class Game(NamedTuple):
         if has_light:
             enlighten_cells.extend(self.board.visible_cells_coords_from(pos))
 
+        # not on the first and term in the lambda: a connected tile may be empty
+        # when falling because the crumbled tile may have few open directions
+        # then a pit (that has all the four of them)
+
         dropped_tiles = filter(
-            lambda cell_coords: not self.is_enlightened(cell_coords), enlighten_cells
+            lambda cell_coords: self.board.at(cell_coords).tile is not None
+            and not self.is_enlightened(cell_coords),
+            enlighten_cells,
         )
 
         new_board = self.board.drop_tiles(dropped_tiles)
