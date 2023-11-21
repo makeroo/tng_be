@@ -148,8 +148,9 @@ class TNGFSM:
         if is_crumbling[player_cell.tile]:
             game = game.change_to_pit(player_status.pos).player_falls(game.turn)
 
-            # TODO: trigger monster attacks
-            raise NotImplementedError('trigger monster')
+            if is_monster[drawn_tile]:
+                # TODO: trigger monster attacks
+                raise NotImplementedError('trigger monster not implemented')
 
         game = game.set_turn(turn=(game.turn + 1) % len(game.players))
 
@@ -208,6 +209,53 @@ class TNGFSM:
             return new_game.new_phase(Phase.discover_tiles)
 
         return new_game.set_turn((game.turn + 1) % len(game.players))
+
+    def discover_tiles_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
+        # this is the start macro phase, there is no need
+        # to check for bounds: there are surely tiles to draw
+        placed_tile = game.tile_holder[game.draw_index]
+
+        return (
+            self._apply_place_tile(game, player, move, placed_tile)
+            .new_phase(Phase.rotate_discovered_tile)
+            .draw_tile()
+        )
+
+    def rotate_discovered_tile_rotate_tile(
+        self, game: Game, player: PlayerColor, move: RotateTile
+    ) -> Game:
+        # validate move
+
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
+
+        last_placed_cell = game.board.at(game.last_placed_tile_pos)
+
+        if last_placed_cell.tile is None:
+            raise GameRuntimeError('empty cell')
+
+        new_game = game.place_tile(game.last_placed_tile_pos, last_placed_cell.tile, move.direction)
+
+        if player_status.pos not in new_game.board.visible_cells_coords_from(
+            new_game.last_placed_tile_pos
+        ):
+            raise IllegalMove('not_connected')
+
+        # apply
+
+        cells = new_game.board.visible_cells_from(player_status.pos)
+
+        if any(cell.tile is None for cell in cells):
+            return new_game.new_phase(Phase.discover_tiles)
+
+        return new_game.new_phase(Phase.move_player).set_turn(
+            (new_game.turn + 1) % len(new_game.players)
+        )
 
     def _apply_place_tile(
         self, game: Game, player: PlayerColor, move: PlaceTile, tile: Tile

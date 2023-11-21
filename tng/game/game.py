@@ -155,6 +155,7 @@ class Phase(Enum):
     move_player = 'move_player'
     place_monster = 'place_monster'
     discover_tiles = 'discover_tiles'
+    rotate_discovered_tile = 'rotate_discovered_tile'
 
 
 class Game(NamedTuple):
