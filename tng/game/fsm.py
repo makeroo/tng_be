@@ -114,20 +114,26 @@ class TNGFSM:
     ) -> Game:
         # validate move
 
-        x = move.pos.x
-        y = move.pos.y
-        edge_length = game.board.edge_length
-
-        if x < 0 or x >= edge_length:
-            raise IllegalMove('x out of board')
-
-        if y < 0 or y >= edge_length:
-            raise IllegalMove('y out of board')
-
         player_status = game.players[game.turn]
 
         if player_status.color != player:
             raise IllegalMove('not player turn')
+
+        if player_status.pos is None:
+            # assuming placing start
+
+            x = move.pos.x
+            y = move.pos.y
+            edge_length = game.board.edge_length
+
+            if x < 0 or x >= edge_length:
+                raise IllegalMove('x out of board')
+
+            if y < 0 or y >= edge_length:
+                raise IllegalMove('y out of board')
+
+        elif move.pos not in game.board.visible_cells_coords_from(player_status.pos):
+            raise IllegalMove('not connected')
 
         cell = game.board.at(move.pos)
 
