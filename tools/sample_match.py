@@ -109,7 +109,7 @@ def run_sample_match():
             player=PlayerColor.purple,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.s),
         ),
-        # in game macro phase
+        # in game macro phase, move turn 1
         Move(  # 20
             player=PlayerColor.blue,
             param=Walk(move=MoveType.walk, direction=Direction.w),
@@ -125,6 +125,34 @@ def run_sample_match():
         Move(  # 23
             player=PlayerColor.red,
             param=Stay(move=MoveType.stay),
+        ),
+        Move(  # 24
+            player=PlayerColor.green,
+            param=Walk(move=MoveType.walk, direction=Direction.e),
+        ),
+        Move(  # 25
+            player=PlayerColor.green,
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=0)),
+        ),
+        Move(  # 26
+            player=PlayerColor.green,
+            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
+        ),
+        Move(  # 27
+            player=PlayerColor.green,
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=2)),
+        ),
+        Move(  # 28
+            player=PlayerColor.green,
+            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.e),
+        ),
+        Move(  # 29
+            player=PlayerColor.purple,
+            param=Walk(move=MoveType.walk, direction=Direction.w),
+        ),
+        Move(  # 30
+            player=PlayerColor.purple,
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=4, y=0)),
         ),
     ]
 
