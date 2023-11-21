@@ -119,38 +119,34 @@ def run_sample_match():
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=1, y=4)),
         ),
         Move(  # 22
-            player=PlayerColor.blue,
-            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
-        ),
-        Move(  # 23
             player=PlayerColor.red,
             param=Stay(move=MoveType.stay),
         ),
-        Move(  # 24
+        Move(  # 23
             player=PlayerColor.green,
             param=Walk(move=MoveType.walk, direction=Direction.e),
         ),
-        Move(  # 25
+        Move(  # 24
             player=PlayerColor.green,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=0)),
         ),
-        Move(  # 26
+        Move(  # 25
             player=PlayerColor.green,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
         ),
-        Move(  # 27
+        Move(  # 26
             player=PlayerColor.green,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=2)),
         ),
-        Move(  # 28
+        Move(  # 27
             player=PlayerColor.green,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.e),
         ),
-        Move(  # 29
+        Move(  # 28
             player=PlayerColor.purple,
             param=Walk(move=MoveType.walk, direction=Direction.w),
         ),
-        Move(  # 30
+        Move(  # 29
             player=PlayerColor.purple,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=4, y=0)),
         ),

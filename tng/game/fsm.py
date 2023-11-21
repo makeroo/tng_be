@@ -220,8 +220,9 @@ class TNGFSM:
 
         player_status = game.players[game.turn]
 
-        if player_status.color != player:
-            raise IllegalMove('not player turn')
+        # checked in the _apply_place_tile
+        # if player_status.color != player:
+        #     raise IllegalMove('not player turn')
 
         if game.draw_index >= len(game.tile_holder):
             raise IllegalMove('final flickres')
@@ -230,22 +231,20 @@ class TNGFSM:
 
         placed_tile = game.tile_holder[game.draw_index]
 
+        new_game = self._apply_place_tile(game, player, move, placed_tile).draw_tile()
+
         if placed_tile in (Tile.t_passage, Tile.straight_passage, Tile.t_passage):
-            return (
-                self._apply_place_tile(game, player, move, placed_tile)
-                .new_phase(Phase.rotate_discovered_tile)
-                .draw_tile()
-            )
+            return new_game.new_phase(Phase.rotate_discovered_tile)
 
         if player_status.pos is None:
             raise GameRuntimeError('player without pos')
 
-        cells = game.board.visible_cells_from(player_status.pos)
+        cells = new_game.board.visible_cells_from(player_status.pos)
 
         if any(cell.tile is None for cell in cells):
-            return game.new_phase(Phase.discover_tiles)
+            return new_game.new_phase(Phase.discover_tiles)
 
-        return game.new_phase(Phase.move_player).set_turn((game.turn + 1) % len(game.players))
+        return new_game.new_phase(Phase.move_player).set_turn((game.turn + 1) % len(game.players))
 
     def rotate_discovered_tile_rotate_tile(
         self, game: Game, player: PlayerColor, move: RotateTile
