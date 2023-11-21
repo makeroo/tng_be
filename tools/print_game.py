@@ -106,7 +106,10 @@ def print_player(p: Player) -> str:
     r = []
 
     if p.falling:
-        r.append('falling')
+        if p.pos is None:
+            raise Exception('falling player without pos')
+
+        r.append(f'falling from {p.pos.x},{p.pos.y}')
 
     if p.has_key:
         r.append('key')
