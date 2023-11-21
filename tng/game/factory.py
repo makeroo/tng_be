@@ -1,4 +1,4 @@
-from random import shuffle
+from random import Random
 
 from .types import Tile, PlayerColor, Direction, Position
 from .game import Game, Board, Cell, Player, Phase
@@ -35,6 +35,9 @@ class GameFactory:
         Tile.straight_passage: 10 - standard_deck_up_to_four_players_opening[Tile.straight_passage],
     }
 
+    def __init__(self, random: Random | None = None) -> None:
+        self.random = random if random is not None else Random()
+
     def build_cards(self, specs: dict[Tile, int]) -> list[Tile]:
         return [v for t, x in specs.items() for v in [t] * x]
 
@@ -42,8 +45,8 @@ class GameFactory:
         deck_initial = self.build_cards(initial)
         deck_remaining = self.build_cards(remaining)
 
-        shuffle(deck_initial)
-        shuffle(deck_remaining)
+        self.random.shuffle(deck_initial)
+        self.random.shuffle(deck_remaining)
 
         return deck_initial + deck_remaining
 
