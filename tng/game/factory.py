@@ -57,6 +57,9 @@ class GameFactory:
         if len(colors) > 5:
             raise ValueError("too many players")
 
+        if len(colors) < 4:
+            raise ValueError("too few players")
+
         if len(colors) != len(set(colors)):
             raise ValueError("duplicated colors")
 
