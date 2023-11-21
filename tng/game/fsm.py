@@ -7,7 +7,7 @@ It:
 """
 
 from .game import Game, Phase, GameRuntimeError
-from .moves import Move, PlaceTile, RotateTile, Stay, Walk
+from .moves import Move, PlaceTile, RotateTile, Stay, Walk, Fall
 from .types import PlayerColor, Tile, Direction, is_crumbling, is_monster
 
 
@@ -161,6 +161,22 @@ class TNGFSM:
         game = game.set_turn(turn=(game.turn + 1) % len(game.players))
 
         return game
+
+    def fall_direction_fall(self, game: Game, player: PlayerColor, move: Fall) -> Game:
+        # validate move
+
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        # apply
+
+        return (
+            game.fall_direction(game.turn, move.direction)
+            .set_turn(turn=(game.turn + 1) % len(game.players))
+            .new_phase(Phase.move_player)
+        )
 
     def move_player_walk(self, game: Game, player: PlayerColor, move: Walk) -> Game:
         # validate move

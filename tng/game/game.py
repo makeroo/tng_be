@@ -26,7 +26,7 @@ They are managed by FSM which uses several Game calls.
 from typing import NamedTuple, Iterable, Iterator
 from enum import Enum
 
-from .types import Tile, Direction, PlayerColor, Position, open_directions
+from .types import Tile, Direction, PlayerColor, Position, open_directions, FallDirection
 
 
 class GameRuntimeError(Exception):
@@ -140,11 +140,14 @@ class Player(NamedTuple):
     has_light: bool
     falling: bool
 
-    # player position:
-    # both None -> initial turn, not yet on map
-    # both int -> on map
-    # only one int -> falling
+    # player state:
+    # falling False, pos None: start, fall_direction: None, the player has to place the start tile yet
+    # falling False, pos not None, fall_direction: None, player on board
+    # falling True, pos not None, fall_direction: None, player falling, they have to decide if row or column
+    # falling True, pos not None, fall_direction: not None, player falling, they decided if row or column
     pos: Position | None
+
+    fall_direction: FallDirection | None
 
 
 class Phase(Enum):
@@ -326,3 +329,14 @@ class Game(NamedTuple):
                 return p
 
         raise GameRuntimeError('player not found')
+
+    def fall_direction(self, player_idx: int, direction: FallDirection) -> 'Game':
+        player_status = self.players[player_idx]
+
+        new_player_status = player_status._replace(fall_direction=direction)
+
+        new_players = list(self.players)
+
+        new_players[player_idx] = new_player_status
+
+        return self._replace(players=new_players)

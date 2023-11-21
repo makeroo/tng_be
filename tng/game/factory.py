@@ -91,6 +91,7 @@ class GameFactory:
                     has_light=True,
                     falling=False,
                     pos=None,
+                    fall_direction=None,
                 )
                 for color in colors
             ],
