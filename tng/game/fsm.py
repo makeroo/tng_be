@@ -146,11 +146,17 @@ class TNGFSM:
             raise GameRuntimeError('player\'s cell has no tile')
 
         if is_crumbling[player_cell.tile]:
-            game = game.change_to_pit(player_status.pos).player_falls(game.turn)
+            game = (
+                game.change_to_pit(player_status.pos)
+                .player_falls(game.turn)
+                .new_phase(Phase.fall_direction)
+            )
 
             if is_monster[drawn_tile]:
                 # TODO: trigger monster attacks
                 raise NotImplementedError('trigger monster not implemented')
+
+            return game
 
         game = game.set_turn(turn=(game.turn + 1) % len(game.players))
 
