@@ -80,32 +80,31 @@ class TNGFSM:
         if player_status.pos is None:
             raise GameRuntimeError('player without pos')
 
-        rotated_cell = game.board.at(game.last_placed_tile_pos)
-        player_cell = game.board.at(player_status.pos)
+        last_placed_cell = game.board.at(game.last_placed_tile_pos)
 
-        from_dirs = player_cell.open_directions()
+        if last_placed_cell.tile is None:
+            raise GameRuntimeError('empty cell')
 
-        rotated_cell = rotated_cell._replace(direction=move.direction)
+        new_game = game.place_tile(game.last_placed_tile_pos, last_placed_cell.tile, move.direction)
 
-        to_dirs = rotated_cell.open_directions()
-
-        if not any(connected_to[fd] is td for fd in from_dirs for td in to_dirs):
+        if player_status.pos not in new_game.board.visible_cells_coords_from(
+            new_game.last_placed_tile_pos
+        ):
             raise IllegalMove('not_connected')
 
         # apply
 
-        if rotated_cell.tile is None:
-            raise GameRuntimeError('empty cell')
-
-        game = game.place_tile(game.last_placed_tile_pos, rotated_cell.tile, move.direction)
-
-        cells = game.board.visible_cells_from(player_status.pos)
+        cells = new_game.board.visible_cells_from(player_status.pos)
 
         if any(cell.tile is None for cell in cells):
-            return game.new_phase(Phase.discover_start_tiles)
+            return new_game.new_phase(Phase.discover_start_tiles)
 
-        elif game.turn + 1 == len(game.players):
-            return game.new_phase(Phase.move_player).set_turn(0)
+        elif new_game.turn + 1 == len(new_game.players):
+            return new_game.new_phase(Phase.move_player).set_turn(0)
+
+        else:
+            return new_game.new_phase(Phase.place_start).set_turn(game.turn + 1)
+
 
         else:
             return game.new_phase(Phase.place_start).set_turn(game.turn + 1)
