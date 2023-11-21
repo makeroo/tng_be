@@ -7,8 +7,8 @@ It:
 """
 
 from .game import Game, Phase, GameRuntimeError
-from .moves import Move, PlaceTile, RotateTile
-from .types import PlayerColor, Tile, Direction, connected_to, is_crumbling, is_monster
+from .moves import Move, PlaceTile, RotateTile, Stay, Walk
+from .types import PlayerColor, Tile, Direction, is_crumbling, is_monster
 
 
 class IllegalMove(ValueError):
@@ -105,9 +105,109 @@ class TNGFSM:
         else:
             return new_game.new_phase(Phase.place_start).set_turn(game.turn + 1)
 
+    def move_player_stay(self, game: Game, player: PlayerColor, move: Stay) -> Game:
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        if player_status.falling:
+            raise IllegalMove('falling player')
+
+        if not player_status.has_light and player_status.nerves == 0:
+            raise IllegalMove('no nerves, forced to walk')
+
+        # apply
+
+        if game.draw_index < len(game.tile_holder):
+            drawn_tile = game.tile_holder[game.draw_index]
+
+            game = game.draw_tile()
+
+            if is_monster[drawn_tile]:
+                return game.new_phase(Phase.place_monster)
 
         else:
-            return game.new_phase(Phase.place_start).set_turn(game.turn + 1)
+            # TODO: final flickers
+            raise NotImplementedError('final flickers')
+
+        if not player_status.has_light:
+            game = game.change_nerves(game.turn, -1)
+
+        elif player_status.nerves < 2:
+            game = game.change_nerves(game.turn, +1)
+
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
+
+        player_cell = game.board.at(player_status.pos)
+
+        if player_cell.tile is None:
+            raise GameRuntimeError('player\'s cell has no tile')
+
+        if is_crumbling[player_cell.tile]:
+            game = game.change_to_pit(player_status.pos).player_falls(game.turn)
+
+            # TODO: trigger monster attacks
+            raise NotImplementedError('trigger monster')
+
+        game = game.set_turn(turn=(game.turn + 1) % len(game.players))
+
+        return game
+
+    def move_player_walk(self, game: Game, player: PlayerColor, move: Walk) -> Game:
+        # validate move
+
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        if player_status.falling:
+            raise IllegalMove('falling player')
+
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
+
+        player_cell = game.board.at(player_status.pos)
+
+        if move.direction not in player_cell.open_directions():
+            raise IllegalMove('illegal direction')
+
+        dest_pos = game.board.dest_coords(player_status.pos, move.direction)
+
+        dest_cell = game.board.at(dest_pos)
+
+        if dest_cell.tile is None:
+            raise GameRuntimeError('empty tile that shouldn\'t')
+
+        if len(dest_cell.players) > 0 and dest_cell.tile is not Tile.gate:
+            raise IllegalMove('dest tile already occupied')
+
+        # apply
+
+        new_game = game.move_player(game.turn, dest_pos)
+
+        if player_cell.tile is None:
+            raise GameRuntimeError('player\'s cell has no tile')
+
+        if is_crumbling[player_cell.tile]:
+            new_game = new_game.change_to_pit(player_status.pos)
+
+        # TODO: trigger monster attacks
+
+        # TODO: relighting
+        new_player_status = new_game.players[new_game.turn]
+
+        if new_player_status.pos is None:
+            raise GameRuntimeError('moved player lost pos')
+
+        cells = game.board.visible_cells_from(new_player_status.pos)
+
+        if any(cell.tile is None for cell in cells):
+            return new_game.new_phase(Phase.discover_tiles)
+
+        return new_game.set_turn((game.turn + 1) % len(game.players))
 
     def _apply_place_tile(
         self, game: Game, player: PlayerColor, move: PlaceTile, tile: Tile

@@ -28,10 +28,10 @@ class Stay(BaseModel):
 
 
 class Walk(BaseModel):
-    move: Literal[MoveType.stay]
+    move: Literal[MoveType.walk]
     direction: Direction
 
 
 class Move(BaseModel):
     player: PlayerColor
-    param: PlaceTile | RotateTile = Field(discriminator='move')
+    param: PlaceTile | RotateTile | Stay | Walk = Field(discriminator='move')
