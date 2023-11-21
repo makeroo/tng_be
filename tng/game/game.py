@@ -23,7 +23,7 @@ Note: an exception to this principle are the turn/phase flags.
 They are managed by FSM which uses several Game calls.
 """
 
-from typing import NamedTuple, Iterable
+from typing import NamedTuple, Iterable, Iterator
 from enum import Enum
 
 from .types import Tile, Direction, PlayerColor, Position, open_directions
@@ -246,6 +246,41 @@ class Game(NamedTuple):
             raise GameRuntimeError('player not placed')
 
         return new_game._drop_tiles(player_status.pos, player_status.has_light)
+
+    def relight_near_players(self, player_status: Player) -> 'Game':
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
+
+        player_updates: dict[PlayerColor, Player] = {}
+
+        for p in filter(lambda p: not p.has_light, self.near_players(player_status.pos)):
+            player_updates[p.color] = p._replace(has_light=True)
+
+        if not player_updates:
+            return self
+
+        new_players = [player_updates.get(p.color, p) for p in self.players]
+
+        return self._replace(players=new_players)
+
+    def relight_me(self, player_status: Player) -> 'Game':
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
+
+        if all(not p.has_light for p in self.near_players(player_status.pos)):
+            return self
+
+        new_player_status = player_status._replace(has_light=True)
+
+        new_players = [
+            p if p.color != new_player_status.color else new_player_status for p in self.players
+        ]
+
+        return self._replace(players=new_players)
+
+    def near_players(self, pos: Position) -> Iterator[Player]:
+        for cell in self.board.visible_cells_from(pos):
+            yield from map(self.player_status, cell.players)
 
     def _drop_tiles(self, pos: Position, has_light: bool) -> 'Game':
         enlighten_cells = [pos]

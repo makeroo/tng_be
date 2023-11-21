@@ -197,8 +197,13 @@ class TNGFSM:
 
         # TODO: trigger monster attacks
 
-        # TODO: relighting
         new_player_status = new_game.players[new_game.turn]
+
+        if new_player_status.has_light:
+            new_game = new_game.relight_near_players(new_player_status)
+
+        else:
+            new_game = new_game.relight_me(new_player_status)
 
         if new_player_status.pos is None:
             raise GameRuntimeError('moved player lost pos')
