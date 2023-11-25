@@ -17,7 +17,7 @@ class IllegalMove(ValueError):
 
 class TNGFSM:
     def apply(self, game: Game, move: Move) -> Game:
-        handler = getattr(self, f'{game.phase.value}_{move.param.move}')
+        handler = getattr(self, f'{game.phase.value}_{move.param.move.value}')
 
         return handler(game, move.player, move.param)
 
