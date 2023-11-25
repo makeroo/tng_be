@@ -113,10 +113,10 @@ def print_player(p: Player) -> str:
             r.append(f'falling from {p.pos.x},{p.pos.y}')
 
         elif p.fall_direction is FallDirection.column:
-            r.append(f'falling on column {p.pos.y}')
+            r.append(f'falling on column {p.pos.x}')
 
         elif p.fall_direction is FallDirection.row:
-            r.append(f'falling on row {p.pos.x}')
+            r.append(f'falling on row {p.pos.y}')
 
         else:
             raise Exception(f'unknown fall direction {p.fall_direction}')
