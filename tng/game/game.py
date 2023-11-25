@@ -202,6 +202,9 @@ class Game(NamedTuple):
 
         dest_cell = self.board.at(pos)
 
+        if dest_cell.tile is Tile.key and not new_player_status.has_key:
+            new_player_status = new_player_status._replace(has_key=True)
+
         if dest_cell.tile is Tile.pit:
             new_player_status = new_player_status._replace(falling=True)
             board_pos = None
