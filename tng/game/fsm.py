@@ -255,7 +255,7 @@ class TNGFSM:
 
         new_game = self._apply_place_tile(game, player, move, placed_tile).draw_tile()
 
-        if placed_tile in (Tile.t_passage, Tile.straight_passage, Tile.t_passage):
+        if placed_tile in (Tile.t_passage, Tile.straight_passage):
             return new_game.new_phase(Phase.rotate_discovered_tile)
 
         if player_status.pos is None:
