@@ -198,7 +198,7 @@ class Game(NamedTuple):
     def move_player(self, player_idx: int, pos: Position) -> 'Game':
         player_status = self.players[player_idx]
 
-        new_player_status = player_status._replace(pos=pos)
+        new_player_status = player_status._replace(pos=pos, falling=False, fall_direction=None)
 
         dest_cell = self.board.at(pos)
 
