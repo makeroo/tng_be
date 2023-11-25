@@ -160,6 +160,7 @@ class Phase(Enum):
     discover_tiles = 'discover_tiles'
     rotate_discovered_tile = 'rotate_discovered_tile'
     fall_direction = 'fall_direction'
+    drop_on_tile = 'drop_on_tile'
 
 
 class Game(NamedTuple):
