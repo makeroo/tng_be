@@ -7,8 +7,8 @@ It:
 """
 
 from .game import Game, Phase, GameRuntimeError
-from .moves import Move, PlaceTile, RotateTile, Stay, Walk, Fall
-from .types import PlayerColor, Tile, Direction, is_crumbling, is_monster
+from .moves import Move, PlaceTile, RotateTile, Stay, Walk, Fall, Drop
+from .types import PlayerColor, Tile, Direction, is_crumbling, is_monster, FallDirection, Position
 
 
 class IllegalMove(ValueError):
@@ -236,6 +236,76 @@ class TNGFSM:
             return new_game.new_phase(Phase.discover_tiles)
 
         return new_game.set_turn((game.turn + 1) % len(game.players))
+
+    def move_player_drop(self, game: Game, player: PlayerColor, move: Drop) -> 'Game':
+        # validate
+
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        if move.place < 0 or move.place >= game.board.edge_length:
+            raise IllegalMove('out of bounds')
+
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
+
+        if player_status.fall_direction is FallDirection.column:
+            pos = Position(player_status.pos.x, move.place)
+
+        elif player_status.fall_direction is FallDirection.row:
+            pos = Position(move.place, player_status.pos.y)
+
+        else:
+            raise GameRuntimeError(f'unknown player fall direction {player_status.fall_direction}')
+
+        cell = game.board.at(pos)
+
+        if cell.tile is not None and (
+            (
+                player_status.fall_direction is FallDirection.column
+                and any(
+                    game.board.at(Position(ccrow, player_status.pos.y)).tile is None
+                    for ccrow in range(game.board.edge_length)
+                )
+                or any(
+                    game.board.at(Position(player_status.pos.x, cccol)).tile is None
+                    for cccol in range(game.board.edge_length)
+                )
+            )
+        ):
+            raise IllegalMove('tile not empty')
+
+        if game.draw_index >= len(game.tile_holder):
+            raise IllegalMove('game ended in loss')
+
+        # apply
+
+        if cell.tile is None:
+            drawn_tile = game.tile_holder[game.draw_index]
+
+            new_game = game.draw_tile().place_tile(pos, drawn_tile).move_player(game.turn, pos)
+
+            if drawn_tile in (Tile.straight_passage, Tile.t_passage):
+                return game.new_phase(Phase.drop_on_tile)
+
+            if is_monster[drawn_tile]:
+                # TODO monster attacks -> select an empty tile or draw a tile
+                raise NotImplementedError('monster attacks')
+
+            cells = new_game.board.visible_cells_from(pos)
+
+            if any(cell.tile is None for cell in cells):
+                return new_game.new_phase(Phase.discover_tiles)
+
+            return new_game.new_phase(Phase.move_player).set_turn(
+                (game.turn + 1) % len(game.players)
+            )
+
+        new_game = game.move_player(game.turn, pos)
+
+        return new_game
 
     def discover_tiles_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
         # validate
