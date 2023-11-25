@@ -204,6 +204,10 @@ class Game(NamedTuple):
 
         if dest_cell.tile is Tile.pit:
             new_player_status = new_player_status._replace(falling=True)
+            board_pos = None
+
+        else:
+            board_pos = new_player_status.pos
 
         new_players = list(self.players)
 
@@ -211,7 +215,7 @@ class Game(NamedTuple):
 
         new_game = self._replace(
             players=new_players,
-            board=self.board.move_player(player_status.color, player_status.pos, pos),
+            board=self.board.move_player(player_status.color, player_status.pos, board_pos),
         )
 
         if player_status.pos is None:
