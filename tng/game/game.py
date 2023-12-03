@@ -117,6 +117,18 @@ class Board(NamedTuple):
 
         return r
 
+    def is_connected(self, from_pos: Position, d: Direction) -> bool:
+        cell = self.at(from_pos)
+
+        if cell.tile is None:
+            return False
+
+        for od in cell.open_directions():
+            if od is d:
+                return True
+
+        return False
+
     def drop_tiles(self, dropped_tiles: Iterable[tuple[int, int]]) -> 'Board':
         new_cells = list(self.cells)
 
