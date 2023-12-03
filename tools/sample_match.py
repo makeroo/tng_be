@@ -226,6 +226,34 @@ def run_sample_match():
             player=PlayerColor.purple,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
         ),
+        Move(  # 49
+            player=PlayerColor.blue,
+            param=Walk(move=MoveType.walk, direction=Direction.s),
+        ),
+        Move(  # 50
+            player=PlayerColor.blue,
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(2, 5)),
+        ),
+        Move(  # 51
+            player=PlayerColor.blue,
+            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
+        ),
+        Move(  # 52
+            player=PlayerColor.blue,
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(0, 5)),
+        ),
+        Move(  # 53
+            player=PlayerColor.blue,
+            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.s),
+        ),
+        Move(  # 54
+            player=PlayerColor.blue,
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(1, 0)),
+        ),
+        Move(  # 54
+            player=PlayerColor.red,
+            param=Walk(move=MoveType.walk, direction=Direction.e),
+        ),
     ]
 
     # print(GameData(move_idx=0, move=None, resulting_game=game))
