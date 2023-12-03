@@ -1,4 +1,4 @@
-from tng.game.types import Direction, Tile, FallDirection
+from tng.game.types import Direction, Tile, FallDirection, PlayerColor
 from tng.game.game import Board, Cell, Game, Player
 from tng.game.moves import Move, MoveType
 
@@ -93,9 +93,20 @@ def print_cell(cell: Cell) -> str:
     return str(len(cell.players))
 
 
-def print_board(board: Board) -> str:
+def colored_dot(color: PlayerColor) -> str:
+    ansi_seq = getattr(Colors, color.value)
+    return ansi_seq + '*' + Colors.end
+
+
+def print_board(board: Board, falling_in_rows: dict[int, list[PlayerColor]]) -> str:
+    def row_markers(row):
+        players = falling_in_rows.get(row, [])
+
+        return '    '[: 4 - len(players)] + ''.join(colored_dot(c) for c in players)
+
     matrix = [
-        ''.join(print_cell(cell) for cell in board.cells[i : i + board.edge_length])
+        row_markers(i)
+        + ''.join(print_cell(cell) for cell in board.cells[i : i + board.edge_length])
         for i in range(0, len(board.cells), board.edge_length)
     ]
 
@@ -133,13 +144,57 @@ def print_player(p: Player) -> str:
 
 
 def print_game(game: Game) -> str:
-    board = print_board(game.board)
+    # TODO: hilight fall cell
+    # TODO: show the discarded cards
+
+    fallin_in_rows = {}
+    fallin_in_cols = {}
+
+    for p in game.players:
+        if not p.falling or p.pos is None:
+            continue
+
+        if p.fall_direction is FallDirection.row:
+            fallin_in_rows.setdefault(p.pos.y, []).append(p.color)
+
+        if p.fall_direction is FallDirection.column:
+            fallin_in_cols.setdefault(p.pos.x, []).append(p.color)
+
+    header_height = max(len(r) for r in fallin_in_cols.values()) if fallin_in_cols else 0
+
+    def build_header_row(hr: int):
+        colors = []
+
+        for x in range(game.board.edge_length):
+            hc = fallin_in_cols.get(x, [])
+
+            if len(hc) <= hr:
+                colors.append(' ')
+                continue
+
+            colors.append(colored_dot(hc[hr]))
+
+        return '    ' + ''.join(colors)
+
+    board_header = []
+
+    for header_row in range(header_height - 1, -1, -1):
+        board_header.append(build_header_row(header_row))
+
+    board = print_board(game.board, fallin_in_rows)
 
     p = game.players[game.turn]
 
     turn = f'\nturn: {getattr(Colors, p.color.value)}{p.color.value}{Colors.end}, phase: {game.phase.value}'
 
-    return board + '\n\n' + '\n'.join(print_player(ps) for ps in game.players) + turn
+    return (
+        ''.join(board_header)
+        + '\n'
+        + board
+        + '\n\n'
+        + '\n'.join(print_player(ps) for ps in game.players)
+        + turn
+    )
 
 
 def print_move(m: Move) -> str:
