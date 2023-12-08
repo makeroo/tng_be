@@ -129,7 +129,7 @@ class Board(NamedTuple):
 
         return False
 
-    def drop_tiles(self, dropped_tiles: Iterable[tuple[int, int]]) -> 'Board':
+    def drop_tiles(self, dropped_tiles: Iterable[Position]) -> 'Board':
         new_cells = list(self.cells)
 
         for x, y in dropped_tiles:
