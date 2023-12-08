@@ -6,9 +6,10 @@ It:
 2. make that move returning the resulting game state.
 """
 
-from .game import Game, Phase, GameRuntimeError
+from .game import Game, Phase, GameRuntimeError, Player
 from .moves import Move, PlaceTile, RotateTile, Stay, Walk, Fall, Drop
 from .types import PlayerColor, Tile, Direction, is_crumbling, is_monster, FallDirection, Position
+from .monsters import VisibleMonsters
 
 
 class IllegalMove(ValueError):
@@ -209,6 +210,10 @@ class TNGFSM:
 
         # apply
 
+        monsters = VisibleMonsters(game.board)
+
+        monsters.check(player_status.pos)
+
         new_game = game.move_player(game.turn, dest_pos)
 
         if player_cell.tile is None:
@@ -222,7 +227,11 @@ class TNGFSM:
         new_player_status = new_game.players[new_game.turn]
 
         if new_player_status.falling:
-            return new_game.new_phase(Phase.fall_direction)
+            new_game = new_game.new_phase(Phase.fall_direction)
+
+            new_game = self._activate_monsters(new_game, monsters)
+
+            return new_game
 
         if new_player_status.has_light:
             new_game = new_game.relight_near_players(new_player_status)
@@ -233,12 +242,40 @@ class TNGFSM:
         if new_player_status.pos is None:
             raise GameRuntimeError('moved player lost pos')
 
-        cells = game.board.visible_cells_from(new_player_status.pos)
+        monsters.check(new_player_status.pos)
+
+        new_game = self._activate_monsters(new_game, monsters)
+
+        cells = new_game.board.visible_cells_from(new_player_status.pos)
 
         if any(cell.tile is None for cell in cells):
             return new_game.new_phase(Phase.discover_tiles)
 
         return new_game.set_turn((game.turn + 1) % len(game.players))
+
+    def _activate_monsters(self, game: Game, monsters: VisibleMonsters) -> Game:
+        if not monsters.triggered_monsters:
+            return game
+
+        monsters.cover_cells()
+
+        for p in game.players:
+            if p.falling or p.pos is None:
+                continue
+
+            hitting_monsters = monsters.hitting(p.pos)
+
+            for monster in hitting_monsters:
+                game = self._monster_attack(game, monster, p)
+
+        return game
+
+    def _monster_attack(self, game: Game, monster: Tile, player_status: Player) -> Game:
+        if monster == Tile.wax_eater:
+            return game.draw_tiles(3).light_out(player_status)
+
+        else:
+            raise GameRuntimeError(f'unknown monster {monster}')
 
     def move_player_drop(self, game: Game, player: PlayerColor, move: Drop) -> 'Game':
         # validate
@@ -294,8 +331,17 @@ class TNGFSM:
                 return game.new_phase(Phase.drop_on_tile)
 
             if is_monster[drawn_tile]:
-                # TODO monster attacks -> select an empty tile or draw a tile
-                raise NotImplementedError('monster attacks')
+                monsters = VisibleMonsters(new_game.board)
+
+                monsters.add_monster(pos)
+
+                monsters.check(pos)
+
+                new_game = self._activate_monsters(new_game, monsters)
+
+                # TODO: new phase: force dropped player to walk away
+
+                return new_game
 
             cells = new_game.board.visible_cells_from(pos)
 
@@ -307,6 +353,10 @@ class TNGFSM:
             )
 
         new_game = game.move_player(game.turn, pos)
+
+        monsters = VisibleMonsters(new_game.board)
+
+        new_game = self._activate_monsters(new_game, monsters)
 
         return new_game
 
