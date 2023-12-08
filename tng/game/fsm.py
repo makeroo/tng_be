@@ -227,8 +227,6 @@ class TNGFSM:
         if is_crumbling[player_cell.tile]:
             new_game = new_game.change_to_pit(player_status.pos)
 
-        # TODO: trigger monster attacks
-
         new_player_status = new_game.players[new_game.turn]
 
         if new_player_status.falling:
