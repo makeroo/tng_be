@@ -45,13 +45,27 @@ class VisibleMonsters:
             if cell.tile is None:
                 continue
 
-            up_to = self._paint(cell.tile, lambda d: pos.add(0, -d, self.board.edge_length))
+            up_to = self._paint(
+                cell.tile,
+                lambda d: pos.add(0, -d, self.board.edge_length),  # noqa: B023
+            )
 
-            self._paint(cell.tile, lambda d: pos.add(0, d, self.board.edge_length), up_to)
+            self._paint(
+                cell.tile,
+                lambda d: pos.add(0, d, self.board.edge_length),  # noqa: B023
+                up_to,
+            )
 
-            up_to = self._paint(cell.tile, lambda d: pos.add(-d, 0, self.board.edge_length))
+            up_to = self._paint(
+                cell.tile,
+                lambda d: pos.add(-d, 0, self.board.edge_length),  # noqa: B023
+            )
 
-            self._paint(cell.tile, lambda d: pos.add(d, 0, self.board.edge_length), up_to)
+            self._paint(
+                cell.tile,
+                lambda d: pos.add(d, 0, self.board.edge_length),  # noqa: B023
+                up_to,
+            )
 
     def hitting(self, pos: Position) -> list[Tile]:
         return self.hitten_cells.get(pos, [])
