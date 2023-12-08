@@ -24,7 +24,7 @@ class TNGFSM:
 
     def place_start_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
         return (
-            self._apply_place_tile(game, player, move, Tile.start)
+            self._apply_place_tile(game, player, move, Tile.start, replace_allowed=False)
             .new_phase(Phase.rotate_start)
             .move_player(game.turn, move.pos)
         )
@@ -63,7 +63,7 @@ class TNGFSM:
         placed_tile = game.tile_holder[game.draw_index]
 
         return (
-            self._apply_place_tile(game, player, move, placed_tile)
+            self._apply_place_tile(game, player, move, placed_tile, replace_allowed=False)
             .new_phase(Phase.rotate_discovered_start_tile)
             .draw_tile()
         )
@@ -147,21 +147,23 @@ class TNGFSM:
             raise GameRuntimeError('player\'s cell has no tile')
 
         if is_crumbling[player_cell.tile]:
-            game = (
-                game.change_to_pit(player_status.pos)
-                .player_falls(game.turn)
-                .new_phase(Phase.fall_direction)
-            )
+            game = game.change_to_pit(player_status.pos).player_falls(game.turn)
 
             if is_monster[drawn_tile]:
-                # TODO: trigger monster attacks
-                raise NotImplementedError('trigger monster not implemented')
+                return game.new_phase(Phase.replace_monster)
 
-            return game
+            return game.new_phase(Phase.fall_direction)
 
         game = game.set_turn(turn=(game.turn + 1) % len(game.players))
 
         return game
+
+    def replace_monster_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
+        monster_tile = game.tile_holder[game.draw_index - 1]
+
+        return self._apply_place_tile(
+            game, player, move, monster_tile, replace_allowed=True
+        ).new_phase(Phase.fall_direction)
 
     def fall_direction_fall(self, game: Game, player: PlayerColor, move: Fall) -> Game:
         # validate move
@@ -376,7 +378,9 @@ class TNGFSM:
 
         placed_tile = game.tile_holder[game.draw_index]
 
-        new_game = self._apply_place_tile(game, player, move, placed_tile).draw_tile()
+        new_game = self._apply_place_tile(
+            game, player, move, placed_tile, replace_allowed=False
+        ).draw_tile()
 
         if placed_tile in (Tile.t_passage, Tile.straight_passage):
             return new_game.new_phase(Phase.rotate_discovered_tile)
@@ -428,7 +432,7 @@ class TNGFSM:
         )
 
     def _apply_place_tile(
-        self, game: Game, player: PlayerColor, move: PlaceTile, tile: Tile
+        self, game: Game, player: PlayerColor, move: PlaceTile, tile: Tile, *, replace_allowed: bool
     ) -> Game:
         # validate move
 
@@ -455,7 +459,7 @@ class TNGFSM:
 
         cell = game.board.at(move.pos)
 
-        if cell.tile is not None:
+        if not replace_allowed and cell.tile is not None:
             raise IllegalMove('tile not empty')
 
         # apply
