@@ -12,6 +12,9 @@ from .types import PlayerColor, Tile, Direction, is_crumbling, is_monster, FallD
 from .monsters import VisibleMonsters
 
 
+# TODO: check that game has ended
+
+
 class IllegalMove(ValueError):
     pass
 
