@@ -287,6 +287,44 @@ class Game(NamedTuple):
 
         return self._replace(players=new_players)
 
+    def light_out(self, player_status: Player) -> 'Game':
+        if not player_status.has_light:
+            return self
+
+        new_player_status = player_status._replace(has_light=False)
+
+        new_players = [
+            p if p.color != new_player_status.color else new_player_status for p in self.players
+        ]
+
+        new_game = self._replace(players=new_players)
+
+        if new_player_status.pos is None:
+            return new_game
+
+        dropped_tiles: list[Position] = []
+
+        for p in new_game.board.visible_cells_coords_from(new_player_status.pos):
+            if new_game.is_enlightened(p):
+                continue
+
+            cell = new_game.board.at(p)
+
+            if cell.tile is None:
+                continue
+
+            dropped_tiles.append(p)
+
+        if not dropped_tiles:
+            return new_game
+
+        new_board = new_game.board.drop_tiles(dropped_tiles)
+
+        return new_game._replace(board=new_board)
+
+    def draw_tiles(self, how_many: int) -> 'Game':
+        return self._replace(draw_index=min(self.draw_index + how_many, len(self.tile_holder)))
+
     def relight_me(self, player_status: Player) -> 'Game':
         if player_status.pos is None:
             raise GameRuntimeError('player without pos')
