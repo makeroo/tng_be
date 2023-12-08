@@ -174,6 +174,8 @@ class Phase(Enum):
     fall_direction = 'fall_direction'
     drop_on_tile = 'drop_on_tile'
     replace_monster = 'replace_monster'
+    game_lost = 'game_lost'
+    game_won = 'game_won'
 
 
 class Game(NamedTuple):
