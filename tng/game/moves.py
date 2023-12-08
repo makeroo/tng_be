@@ -13,6 +13,7 @@ class MoveType(str, Enum):
     walk = "walk"
     fall = "fall"  # ie. select either row or column
     drop = "drop"  # ie. return on board
+    # TODO pass key
 
 
 class PlaceTile(BaseModel):
