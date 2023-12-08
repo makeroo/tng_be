@@ -66,7 +66,7 @@ class Tile(Enum):
     gate = "gate"
     wax_eater = "wax_eater"
     straight_passage = "straight_passage"
-    t_passage = "t_passage"
+    t_passage = "t_passage"  # FIXME just 2 are crumbling
     four_way_passage = "four_way_passage"
 
     pit = "pit"
