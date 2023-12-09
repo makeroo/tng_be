@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from tng.game.factory import GameFactory
 from tng.game.fsm import TNGFSM
-from tng.game.types import PlayerColor, Direction, Position, FallDirection
+from tng.game.types import PlayerColor, Direction, Position, FallDirection, Tile
 from tng.game.moves import Move, PlaceTile, MoveType, RotateTile, Walk, Stay, Fall, Drop
 from tng.game.game import Game
 
@@ -26,6 +26,85 @@ def run_sample_match():
     game = factory.new_game(
         PlayerColor.blue, PlayerColor.red, PlayerColor.green, PlayerColor.purple
     )
+
+    assert game.tile_holder == [
+        Tile.t_passage,
+        Tile.straight_passage,
+        Tile.t_passage,
+        Tile.four_way_passage,
+        Tile.straight_passage,
+        Tile.t_passage,
+        Tile.four_way_passage,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.wax_eater,
+        Tile.gate,
+        Tile.t_passage,
+        Tile.four_way_passage,
+        Tile.key,
+        Tile.key,
+        Tile.wax_eater,
+        Tile.straight_passage,
+        Tile.t_passage,
+        Tile.wax_eater,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.wax_eater,
+        Tile.gate,
+        Tile.straight_passage,
+        Tile.key,
+        Tile.key,
+        Tile.four_way_passage,
+        Tile.four_way_passage,
+        Tile.straight_passage,
+        Tile.t_passage,
+        Tile.wax_eater,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.gate,
+        Tile.wax_eater,
+        Tile.wax_eater,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.four_way_passage,
+        Tile.four_way_passage,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.four_way_passage,
+        Tile.wax_eater,
+        Tile.four_way_passage,
+        Tile.four_way_passage,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.straight_passage,
+        Tile.t_passage,
+        Tile.straight_passage,
+        Tile.gate,
+        Tile.wax_eater,
+        Tile.t_passage,
+        Tile.wax_eater,
+        Tile.t_passage,
+        Tile.wax_eater,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.key,
+        Tile.t_passage,
+        Tile.straight_passage,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.four_way_passage,
+        Tile.four_way_passage,
+        Tile.key,
+        Tile.straight_passage,
+        Tile.wax_eater,
+        Tile.t_passage,
+        Tile.t_passage,
+        Tile.straight_passage,
+    ]
 
     moves = [
         # start macro phase
@@ -82,141 +161,141 @@ def run_sample_match():
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=1)),
         ),
         Move(  # 13
-            player=PlayerColor.green,
-            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
-        ),
-        Move(  # 14
             player=PlayerColor.purple,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=5, y=1)),
         ),
-        Move(  # 15
+        Move(  # 14
             player=PlayerColor.purple,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
         ),
-        Move(  # 16
+        Move(  # 15
             player=PlayerColor.purple,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=5, y=2)),
         ),
-        Move(  # 17
+        Move(  # 16
             player=PlayerColor.purple,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
         ),
-        Move(  # 18
+        Move(  # 17
             player=PlayerColor.purple,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=4, y=1)),
         ),
-        Move(  # 19
+        Move(  # 18
             player=PlayerColor.purple,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.s),
         ),
         # in game macro phase, move turn 1
-        Move(  # 20
+        Move(  # 19
             player=PlayerColor.blue,
             param=Walk(move=MoveType.walk, direction=Direction.w),
         ),
-        Move(  # 21
+        Move(  # 20
             player=PlayerColor.blue,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=1, y=4)),
         ),
-        Move(  # 22
+        Move(  # 21
             player=PlayerColor.red,
             param=Stay(move=MoveType.stay),
         ),
-        Move(  # 23
+        Move(  # 22
             player=PlayerColor.red,
             param=Fall(move=MoveType.fall, direction=FallDirection.column),
         ),
-        Move(  # 24
+        Move(  # 23
             player=PlayerColor.green,
             param=Walk(move=MoveType.walk, direction=Direction.e),
         ),
-        Move(  # 25
+        Move(  # 24
             player=PlayerColor.green,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=0)),
         ),
-        Move(  # 26
+        Move(  # 25
             player=PlayerColor.green,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
         ),
-        Move(  # 27
+        Move(  # 26
             player=PlayerColor.green,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=2)),
         ),
-        Move(  # 28
+        Move(  # 27
             player=PlayerColor.green,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.e),
+        ),
+        Move(  # 28
+            player=PlayerColor.purple,
+            param=Walk(move=MoveType.walk, direction=Direction.w),
         ),
         Move(  # 29
             player=PlayerColor.purple,
-            param=Walk(move=MoveType.walk, direction=Direction.w),
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=4, y=0)),
         ),
         Move(  # 30
-            player=PlayerColor.purple,
-            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=4, y=0)),
+            player=PlayerColor.blue,
+            param=Walk(move=MoveType.walk, direction=Direction.w),
         ),
         Move(  # 31
             player=PlayerColor.blue,
-            param=Walk(move=MoveType.walk, direction=Direction.w),
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=1, y=5)),
         ),
         Move(  # 32
             player=PlayerColor.blue,
-            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=1, y=5)),
+            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=0, y=4)),
         ),
         Move(  # 33
             player=PlayerColor.blue,
-            param=PlaceTile(move=MoveType.place_tile, pos=Position(x=0, y=4)),
+            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
         ),
         Move(  # 34
             player=PlayerColor.blue,
-            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
-        ),
-        Move(  # 35
-            player=PlayerColor.blue,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=1, y=3)),
         ),
-        Move(  # 36
+        Move(  # 35
             player=PlayerColor.red,
             param=Drop(move=MoveType.drop, place=4),
         ),
-        Move(  # 37
+        Move(  # 36
             player=PlayerColor.red,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(x=3, y=5)),
         ),
-        Move(  # 38
+        Move(  # 37
             player=PlayerColor.red,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(3, 3)),
         ),
-        Move(  # 39
+        Move(  # 38
             player=PlayerColor.red,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(4, 4)),
         ),
-        Move(  # 40
+        Move(  # 39
             player=PlayerColor.red,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.e),
         ),
-        Move(  # 41
+        Move(  # 40
             player=PlayerColor.green,
             param=Walk(move=MoveType.walk, direction=Direction.w),
         ),
-        Move(  # 42
+        Move(  # 41
             player=PlayerColor.green,
             param=Fall(move=MoveType.fall, direction=FallDirection.column),
         ),
-        Move(  # 43
+        Move(  # 42
             player=PlayerColor.purple,
             param=Walk(move=MoveType.walk, direction=Direction.w),
         ),
-        Move(  # 44
+        Move(  # 43
             player=PlayerColor.purple,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(3, 0)),
         ),
-        Move(  # 45
+        Move(  # 44
             player=PlayerColor.purple,
             param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
         ),
-        Move(  # 46
+        Move(  # 45
             player=PlayerColor.purple,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(3, 2)),
+        ),
+        Move(  # 46
+            player=PlayerColor.purple,
+            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.e),
         ),
         Move(  # 47
             player=PlayerColor.purple,
@@ -250,7 +329,7 @@ def run_sample_match():
             player=PlayerColor.blue,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(1, 0)),
         ),
-        Move(  # 54
+        Move(  # 55
             player=PlayerColor.red,
             param=Walk(move=MoveType.walk, direction=Direction.e),
         ),

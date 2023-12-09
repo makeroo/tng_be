@@ -65,11 +65,19 @@ class TNGFSM:
         # to check for bounds: there are surely tiles to draw
         placed_tile = game.tile_holder[game.draw_index]
 
-        return (
-            self._apply_place_tile(game, player, move, placed_tile, replace_allowed=False)
-            .new_phase(Phase.rotate_discovered_start_tile)
-            .draw_tile()
-        )
+        game = self._apply_place_tile(
+            game, player, move, placed_tile, replace_allowed=False
+        ).draw_tile()
+
+        if placed_tile in [Tile.straight_passage, Tile.t_passage]:
+            return game.new_phase(Phase.rotate_discovered_start_tile)
+
+        start_pos = game.players[game.turn].pos
+
+        if start_pos is None:
+            raise GameRuntimeError('current player without pos')
+
+        return self._next_from_discover_start_tiles(game, start_pos)
 
     def rotate_discovered_start_tile_rotate_tile(
         self, game: Game, player: PlayerColor, move: RotateTile
@@ -98,7 +106,10 @@ class TNGFSM:
 
         # apply
 
-        cells = new_game.board.visible_cells_from(player_status.pos)
+        return self._next_from_discover_start_tiles(new_game, player_status.pos)
+
+    def _next_from_discover_start_tiles(self, new_game: Game, start_pos: Position) -> Game:
+        cells = new_game.board.visible_cells_from(start_pos)
 
         if any(cell.tile is None for cell in cells):
             return new_game.new_phase(Phase.discover_start_tiles)
@@ -107,7 +118,7 @@ class TNGFSM:
             return new_game.new_phase(Phase.move_player).set_turn(0)
 
         else:
-            return new_game.new_phase(Phase.place_start).set_turn(game.turn + 1)
+            return new_game.new_phase(Phase.place_start).set_turn(new_game.turn + 1)
 
     def move_player_stay(self, game: Game, player: PlayerColor, move: Stay) -> Game:
         player_status = game.players[game.turn]
