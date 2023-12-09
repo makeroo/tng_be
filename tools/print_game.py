@@ -186,6 +186,7 @@ def print_game(game: Game) -> str:
     p = game.players[game.turn]
 
     turn = f'\nturn: {getattr(Colors, p.color.value)}{p.color.value}{Colors.end}, phase: {game.phase.value}'
+    tiles = f'\nremaining tiles: {len(game.tile_holder) - game.draw_index}'
 
     return (
         ''.join(board_header)
@@ -194,6 +195,7 @@ def print_game(game: Game) -> str:
         + '\n\n'
         + '\n'.join(print_player(ps) for ps in game.players)
         + turn
+        + tiles
     )
 
 
