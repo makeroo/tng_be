@@ -28,82 +28,83 @@ def run_sample_match():
     )
 
     assert game.tile_holder == [
-        Tile.t_passage,
-        Tile.straight_passage,
-        Tile.t_passage,
-        Tile.four_way_passage,
-        Tile.straight_passage,
-        Tile.t_passage,
-        Tile.four_way_passage,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.wax_eater,
-        Tile.gate,
-        Tile.t_passage,
-        Tile.four_way_passage,
-        Tile.key,
-        Tile.key,
-        Tile.wax_eater,
-        Tile.straight_passage,
-        Tile.t_passage,
-        Tile.wax_eater,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.wax_eater,
-        Tile.gate,
-        Tile.straight_passage,
-        Tile.key,
-        Tile.key,
-        Tile.four_way_passage,
-        Tile.four_way_passage,
-        Tile.straight_passage,
-        Tile.t_passage,
-        Tile.wax_eater,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.gate,
-        Tile.wax_eater,
-        Tile.wax_eater,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.four_way_passage,
-        Tile.four_way_passage,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.four_way_passage,
-        Tile.wax_eater,
-        Tile.four_way_passage,
-        Tile.four_way_passage,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.straight_passage,
-        Tile.t_passage,
-        Tile.straight_passage,
-        Tile.gate,
-        Tile.wax_eater,
-        Tile.t_passage,
-        Tile.wax_eater,
-        Tile.t_passage,
-        Tile.wax_eater,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.key,
-        Tile.t_passage,
-        Tile.straight_passage,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.four_way_passage,
-        Tile.four_way_passage,
-        Tile.key,
-        Tile.straight_passage,
-        Tile.wax_eater,
-        Tile.t_passage,
-        Tile.t_passage,
-        Tile.straight_passage,
+        Tile.t_passage,  # 0 rem 76
+        Tile.straight_passage,  # 1 rem 75
+        Tile.t_passage,  # 2 rem 74
+        Tile.four_way_passage,  # 3 rem 73
+        Tile.straight_passage,  # 4 rem 72
+        Tile.t_passage,  # 5 rem 71
+        Tile.four_way_passage,  # 6 rem 70
+        Tile.t_passage,  # 7 rem 69
+        Tile.t_passage,  # 8 rem 68
+        Tile.t_passage,  # 9 rem 67
+        Tile.wax_eater,  # 10 rem 66
+        Tile.gate,  # 11 rem 65
+        Tile.t_passage,  # 12 rem 64
+        Tile.four_way_passage,  # 13 rem 63
+        Tile.key,  # 14 rem 62
+        Tile.key,  # 15 rem 61
+        Tile.wax_eater,  # 16 rem 60
+        Tile.straight_passage,  # 17 rem 59
+        Tile.t_passage,  # 18 rem 58
+        Tile.wax_eater,  # 19 rem 57
+        Tile.t_passage,  # 20 rem 56
+        Tile.t_passage,  # 21 rem 55
+        Tile.t_passage,  # 22 rem 54
+        Tile.wax_eater,  # 23 rem 53
+        Tile.gate,  # 24 rem 52
+        Tile.straight_passage,  # 25 rem 51
+        Tile.key,  # 26 rem 50
+        Tile.key,  # 27 rem 49
+        Tile.four_way_passage,  # 28 rem 48
+        Tile.four_way_passage,  # 29 rem 47
+        Tile.straight_passage,  # 30 rem 46
+        Tile.t_passage,  # 31 rem 45
+        Tile.wax_eater,  # 32 rem 44
+        Tile.t_passage,  # 33 rem 43
+        Tile.t_passage,  # 34 rem 42
+        Tile.t_passage,  # 35 rem 41
+        Tile.gate,  # 36 rem 40
+        Tile.wax_eater,  # 37 rem 39
+        Tile.wax_eater,  # 38 rem 38
+        Tile.t_passage,  # 39 rem 37
+        Tile.t_passage,  # 40 rem 36
+        Tile.four_way_passage,  # 41 rem 35
+        Tile.four_way_passage,  # 42 rem 34
+        Tile.t_passage,  # 43 rem 33
+        Tile.t_passage,  # 44 rem 32
+        Tile.four_way_passage,  # 45 rem 31
+        Tile.wax_eater,  # 46 rem 30
+        Tile.four_way_passage,  # 47 rem 29
+        Tile.four_way_passage,  # 48 rem 28
+        Tile.t_passage,  # 49 rem 27
+        Tile.t_passage,  # 50 rem 26
+        Tile.straight_passage,  # 51 rem 25
+        Tile.t_passage,  # 52 rem 24
+        Tile.straight_passage,  # 53 rem 23
+        Tile.gate,  # 54 rem 22
+        Tile.wax_eater,  # 55 rem 21
+        Tile.t_passage,  # 56 rem 20
+        Tile.wax_eater,  # 57 rem 19
+        Tile.t_passage,  # 58 rem 18
+        Tile.wax_eater,  # 59 rem 17
+        Tile.t_passage,  # 60 rem 16
+        Tile.t_passage,  # 61 rem 15
+        Tile.key,  # 62 rem 14
+        Tile.t_passage,  # 63 rem 13
+        Tile.straight_passage,  # 64 rem 12
+        Tile.t_passage,  # 65 rem 11
+        Tile.t_passage,  # 66 rem 10
+        Tile.t_passage,  # 67 rem 9
+        Tile.four_way_passage,  # 68 rem 8
+        Tile.four_way_passage,  # 69 rem 7
+        Tile.key,  # 70 rem 6
+        Tile.straight_passage,  # 71 rem 5
+        Tile.wax_eater,  # 72 rem 4
+        Tile.t_passage,  # 73 rem 3
+        Tile.t_passage,  # 74 rem 2
+        Tile.straight_passage,  # 75 rem 1
+        # lights out!
     ]
 
     moves = [
@@ -302,34 +303,26 @@ def run_sample_match():
             param=PlaceTile(move=MoveType.place_tile, pos=Position(2, 1)),
         ),
         Move(  # 48
-            player=PlayerColor.purple,
-            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
-        ),
-        Move(  # 49
             player=PlayerColor.blue,
             param=Walk(move=MoveType.walk, direction=Direction.s),
         ),
-        Move(  # 50
+        Move(  # 49
             player=PlayerColor.blue,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(2, 5)),
         ),
-        Move(  # 51
-            player=PlayerColor.blue,
-            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.n),
-        ),
-        Move(  # 52
+        Move(  # 50
             player=PlayerColor.blue,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(0, 5)),
         ),
-        Move(  # 53
+        Move(  # 51
             player=PlayerColor.blue,
-            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.s),
+            param=RotateTile(move=MoveType.rotate_tile, direction=Direction.e),
         ),
-        Move(  # 54
+        Move(  # 52
             player=PlayerColor.blue,
             param=PlaceTile(move=MoveType.place_tile, pos=Position(1, 0)),
         ),
-        Move(  # 55
+        Move(  # 53
             player=PlayerColor.red,
             param=Walk(move=MoveType.walk, direction=Direction.e),
         ),
