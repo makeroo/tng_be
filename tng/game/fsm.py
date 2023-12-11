@@ -134,17 +134,16 @@ class TNGFSM:
 
         # apply
 
-        if game.draw_index < len(game.tile_holder):
-            drawn_tile = game.tile_holder[game.draw_index]
-
-            game = game.draw_tile()
-
-            if is_monster[drawn_tile]:
-                return game.new_phase(Phase.place_monster)
-
-        else:
+        if game.final_flickers():
             # TODO: final flickers
             raise NotImplementedError('final flickers')
+
+        drawn_tile = game.tile_holder[game.draw_index]
+
+        game = game.draw_tile()
+
+        if is_monster[drawn_tile]:
+            return game.new_phase(Phase.place_monster)
 
         if not player_status.has_light:
             game = game.change_nerves(game.turn, -1)
@@ -219,9 +218,13 @@ class TNGFSM:
         dest_cell = game.board.at(dest_pos)
 
         if dest_cell.tile is None:
-            raise GameRuntimeError('empty tile that shouldn\'t')
+            if player_status.has_light:
+                raise GameRuntimeError('empty tile that shouldn\'t')
 
-        if len(dest_cell.players) > 0 and dest_cell.tile is not Tile.gate:
+            if not game.final_flickers():
+                raise IllegalMove('empty dest tile')
+
+        elif len(dest_cell.players) > 0 and dest_cell.tile is not Tile.gate:
             raise IllegalMove('dest tile already occupied')
 
         # apply
@@ -331,7 +334,8 @@ class TNGFSM:
         ):
             raise IllegalMove('tile not empty')
 
-        if game.draw_index >= len(game.tile_holder):
+        if game.final_flickers():
+            # TODO: calc at the end of the previous move
             raise IllegalMove('game ended in loss')
 
         # apply
@@ -383,7 +387,8 @@ class TNGFSM:
         # if player_status.color != player:
         #     raise IllegalMove('not player turn')
 
-        if game.draw_index >= len(game.tile_holder):
+        if game.final_flickers():
+            # TODO: set game lost phase at the previous move
             raise IllegalMove('final flickres')
 
         # apply

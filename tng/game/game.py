@@ -367,6 +367,9 @@ class Game(NamedTuple):
 
         return self._replace(board=new_board)
 
+    def final_flickers(self) -> bool:
+        return self.draw_index >= len(self.tile_holder)
+
     def is_enlightened(self, pos: Position) -> bool:
         """
         A tile is enlightened if either a player is in it or
