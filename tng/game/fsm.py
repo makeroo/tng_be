@@ -14,6 +14,8 @@ from .monsters import VisibleMonsters
 
 # TODO: check that game has ended
 
+# TODO: move again (spend 1 nerve to move again)
+
 
 class IllegalMove(ValueError):
     pass
