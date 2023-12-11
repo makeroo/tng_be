@@ -14,6 +14,9 @@ class MoveType(str, Enum):
     fall = "fall"  # ie. select either row or column
     drop = "drop"  # ie. return on board
     # TODO pass key
+    # TODO block, ie. drop just 2 tiles instead of three (spending 1 nerve)
+    # TODO charge (ie. move into a monster)
+    # TODO sustain (ie. during final flickers do not consume a tile, spending 1 nerve)
 
 
 class PlaceTile(BaseModel):
