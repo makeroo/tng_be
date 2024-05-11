@@ -10,9 +10,9 @@ class MoveType(str, Enum):
     place_tile = "place_tile"
     rotate_tile = "rotate_tile"
     stay = "stay"
-    walk = "walk"
+    crawl = "crawl"
     fall = "fall"  # ie. select either row or column
-    drop = "drop"  # ie. return on board
+    land = "land"  # return on board
     # TODO pass key
     # TODO block, ie. drop just 2 tiles instead of three (spending 1 nerve)
     # TODO charge (ie. move into a monster)
@@ -33,8 +33,8 @@ class Stay(BaseModel):
     move: Literal[MoveType.stay]
 
 
-class Walk(BaseModel):
-    move: Literal[MoveType.walk]
+class Crawl(BaseModel):
+    move: Literal[MoveType.crawl]
     direction: Direction
 
 
@@ -43,11 +43,11 @@ class Fall(BaseModel):
     direction: FallDirection
 
 
-class Drop(BaseModel):
-    move: Literal[MoveType.drop]
+class Land(BaseModel):
+    move: Literal[MoveType.land]
     place: int
 
 
 class Move(BaseModel):
     player: PlayerColor
-    param: PlaceTile | RotateTile | Stay | Walk | Fall | Drop = Field(discriminator='move')
+    param: PlaceTile | RotateTile | Stay | Crawl | Fall | Land = Field(discriminator='move')

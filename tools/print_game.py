@@ -214,17 +214,17 @@ def print_move(m: Move) -> str:
     elif m.param.move == MoveType.stay:
         t = 'stay'
 
-    elif m.param.move == MoveType.walk:
-        walk = m.param
-        t = f'walk {walk.direction.value}'
+    elif m.param.move == MoveType.crawl:
+        crawl = m.param
+        t = f'crawl {crawl.direction.value}'
 
     elif m.param.move == MoveType.fall:
         fall = m.param
         t = f'fall {fall.direction.value}'
 
-    elif m.param.move == MoveType.drop:
-        drop = m.param
-        t = f'drop on {drop.place}'
+    elif m.param.move == MoveType.land:
+        land = m.param
+        t = f'land on {land.place}'
 
     else:
         raise ValueError

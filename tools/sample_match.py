@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from tng.game.factory import GameFactory
 from tng.game.fsm import TNGFSM
 from tng.game.types import PlayerColor, Direction, Position, FallDirection, Tile
-from tng.game.moves import Move, PlaceTile, MoveType, RotateTile, Walk, Stay, Fall, Drop
+from tng.game.moves import Move, PlaceTile, MoveType, RotateTile, Crawl, Stay, Fall, Land
 from tng.game.game import Game
 
 from print_game import print_game, print_move
@@ -188,7 +188,7 @@ def run_sample_match():
         # in game macro phase, move turn 1
         Move(  # 19
             player=PlayerColor.blue,
-            param=Walk(move=MoveType.walk, direction=Direction.w),
+            param=Crawl(move=MoveType.crawl, direction=Direction.w),
         ),
         Move(  # 20
             player=PlayerColor.blue,
@@ -204,7 +204,7 @@ def run_sample_match():
         ),
         Move(  # 23
             player=PlayerColor.green,
-            param=Walk(move=MoveType.walk, direction=Direction.e),
+            param=Crawl(move=MoveType.crawl, direction=Direction.e),
         ),
         Move(  # 24
             player=PlayerColor.green,
@@ -224,7 +224,7 @@ def run_sample_match():
         ),
         Move(  # 28
             player=PlayerColor.purple,
-            param=Walk(move=MoveType.walk, direction=Direction.w),
+            param=Crawl(move=MoveType.crawl, direction=Direction.w),
         ),
         Move(  # 29
             player=PlayerColor.purple,
@@ -232,7 +232,7 @@ def run_sample_match():
         ),
         Move(  # 30
             player=PlayerColor.blue,
-            param=Walk(move=MoveType.walk, direction=Direction.w),
+            param=Crawl(move=MoveType.crawl, direction=Direction.w),
         ),
         Move(  # 31
             player=PlayerColor.blue,
@@ -252,7 +252,7 @@ def run_sample_match():
         ),
         Move(  # 35
             player=PlayerColor.red,
-            param=Drop(move=MoveType.drop, place=4),
+            param=Land(move=MoveType.land, place=4),
         ),
         Move(  # 36
             player=PlayerColor.red,
@@ -272,7 +272,7 @@ def run_sample_match():
         ),
         Move(  # 40
             player=PlayerColor.green,
-            param=Walk(move=MoveType.walk, direction=Direction.w),
+            param=Crawl(move=MoveType.crawl, direction=Direction.w),
         ),
         Move(  # 41
             player=PlayerColor.green,
@@ -280,7 +280,7 @@ def run_sample_match():
         ),
         Move(  # 42
             player=PlayerColor.purple,
-            param=Walk(move=MoveType.walk, direction=Direction.w),
+            param=Crawl(move=MoveType.crawl, direction=Direction.w),
         ),
         Move(  # 43
             player=PlayerColor.purple,
@@ -304,7 +304,7 @@ def run_sample_match():
         ),
         Move(  # 48
             player=PlayerColor.blue,
-            param=Walk(move=MoveType.walk, direction=Direction.s),
+            param=Crawl(move=MoveType.crawl, direction=Direction.s),
         ),
         Move(  # 49
             player=PlayerColor.blue,
@@ -324,7 +324,7 @@ def run_sample_match():
         ),
         Move(  # 53
             player=PlayerColor.red,
-            param=Walk(move=MoveType.walk, direction=Direction.e),
+            param=Crawl(move=MoveType.crawl, direction=Direction.e),
         ),
     ]
 

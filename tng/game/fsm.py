@@ -7,7 +7,7 @@ It:
 """
 
 from .game import Game, Phase, GameRuntimeError, Player
-from .moves import Move, PlaceTile, RotateTile, Stay, Walk, Fall, Drop
+from .moves import Move, PlaceTile, RotateTile, Stay, Crawl, Fall, Land
 from .types import PlayerColor, Tile, Direction, is_crumbling, is_monster, FallDirection, Position
 from .monsters import VisibleMonsters
 
@@ -132,7 +132,7 @@ class TNGFSM:
             raise IllegalMove('falling player')
 
         if not player_status.has_light and player_status.nerves == 0:
-            raise IllegalMove('no nerves, forced to walk')
+            raise IllegalMove('no nerves, forced to crawl')
 
         # apply
 
@@ -196,7 +196,7 @@ class TNGFSM:
             .new_phase(Phase.move_player)
         )
 
-    def move_player_walk(self, game: Game, player: PlayerColor, move: Walk) -> Game:
+    def move_player_crawl(self, game: Game, player: PlayerColor, move: Crawl) -> Game:
         # validate move
 
         player_status = game.players[game.turn]
@@ -296,7 +296,7 @@ class TNGFSM:
         else:
             raise GameRuntimeError(f'unknown monster {monster}')
 
-    def move_player_drop(self, game: Game, player: PlayerColor, move: Drop) -> 'Game':
+    def move_player_land(self, game: Game, player: PlayerColor, move: Land) -> 'Game':
         # validate
 
         player_status = game.players[game.turn]
@@ -359,7 +359,7 @@ class TNGFSM:
 
                 new_game = self._activate_monsters(new_game, monsters)
 
-                # TODO: new phase: force dropped player to walk away
+                # TODO: new phase: force dropped player to crawl away
 
                 return new_game
 
