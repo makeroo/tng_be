@@ -223,7 +223,7 @@ class TNGFSM:
             if player_status.has_light:
                 raise GameRuntimeError('empty tile that shouldn\'t')
 
-            if not game.final_flickers():
+            if game.final_flickers():
                 raise IllegalMove('empty dest tile')
 
         elif len(dest_cell.players) > 0 and dest_cell.tile is not Tile.gate:
