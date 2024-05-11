@@ -9,4 +9,4 @@ The authors provide the whole rulebook online, though, so it's possible to play 
 During the covid-19 pandemic I built a web app to play another tabletop game online with relatives I couldn't meet at the
 time. Therefore I decided to start this project following the same pattern.
 
-This is the be for a web version of the TNG game.
+This is the b/e for a web version of the TNG game.
