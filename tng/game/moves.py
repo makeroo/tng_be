@@ -11,20 +11,28 @@ class MoveType(str, Enum):
     rotate_tile = "rotate_tile"
     stay = "stay"
     crawl = "crawl"
-    fall = "fall"  # ie. select either row or column
+    fall = "fall"  # select either row or column
     land = "land"  # return on board
-    # TODO pass key
-    # TODO block, ie. drop just 2 tiles instead of three (spending 1 nerve)
-    # TODO charge (ie. move into a monster)
-    # TODO sustain (ie. during final flickers do not consume a tile, spending 1 nerve)
+    # TODO pass_key = "pass_key"
+    # TODO block = "block" # drop just 2 tiles instead of three, spending 1 nerve
+    # TODO charge = "charge" # move into a monster
+    # TODO sustain = "sustain" # during final flickers do not consume a tile, spending 1 nerve
 
 
 class PlaceTile(BaseModel):
+    """
+    Draw a tile from the tile holder and place on board.
+    """
+
     move: Literal[MoveType.place_tile]
     pos: Position
 
 
 class RotateTile(BaseModel):
+    """
+    Orient the last placed tile on board.
+    """
+
     move: Literal[MoveType.rotate_tile]
     direction: Direction
 
