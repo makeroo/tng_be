@@ -128,8 +128,8 @@ class Board(NamedTuple):
     def drop_tiles(self, dropped_tiles: Iterable[Position]) -> 'Board':
         new_cells = list(self.cells)
 
-        for x, y in dropped_tiles:
-            pos = y * self.edge_length + x
+        for p in dropped_tiles:
+            pos = p.idx(self.edge_length)
 
             cell = new_cells[pos]
             new_cells[pos] = cell._replace(tile=None)
