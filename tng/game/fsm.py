@@ -140,6 +140,12 @@ class TNGFSM:
             # TODO: final flickers
             raise NotImplementedError('final flickers')
 
+        if not player_status.has_light:
+            game = game.change_nerves(game.turn, -1)
+
+        elif player_status.nerves < 2:
+            game = game.change_nerves(game.turn, +1)
+
         drawn_tile = game.tile_holder[game.draw_index]
 
         game = game.draw_tile()
@@ -147,12 +153,9 @@ class TNGFSM:
         if is_monster[drawn_tile]:
             return game.new_phase(Phase.place_monster)
 
-        if not player_status.has_light:
-            game = game.change_nerves(game.turn, -1)
+        return self._check_falling(game, player_status)
 
-        elif player_status.nerves < 2:
-            game = game.change_nerves(game.turn, +1)
-
+    def _check_falling(self, game: Game, player_status: Player):
         if player_status.pos is None:
             raise GameRuntimeError('player without pos')
 
@@ -163,9 +166,6 @@ class TNGFSM:
 
         if is_crumbling[player_cell.tile]:
             game = game.change_to_pit(player_status.pos).player_falls(game.turn)
-
-            if is_monster[drawn_tile]:
-                return game.new_phase(Phase.replace_monster)
 
             return game.new_phase(Phase.fall_direction)
 
