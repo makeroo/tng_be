@@ -149,10 +149,10 @@ class Player(NamedTuple):
     falling: bool
 
     # player state:
-    # falling False, pos None: start, fall_direction: None, the player has to place the start tile yet
-    # falling False, pos not None, fall_direction: None, player on board
-    # falling True, pos not None, fall_direction: None, player falling, they have to decide if row or column
-    # falling True, pos not None, fall_direction: not None, player falling, they decided if row or column
+    # falling False, pos None,     fall_direction: None     => the player has to place the start tile yet
+    # falling False, pos not None, fall_direction: None     => player on board
+    # falling True,  pos not None, fall_direction: None     => player falling, they have to decide if row or column
+    # falling True,  pos not None, fall_direction: not None => player falling, they decided if row or column
     pos: Position | None
 
     fall_direction: FallDirection | None
