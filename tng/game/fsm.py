@@ -173,12 +173,19 @@ class TNGFSM:
 
         return game
 
-    def replace_monster_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
+    def place_monster_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        # apply
+
         monster_tile = game.tile_holder[game.draw_index - 1]
 
-        return self._apply_place_tile(
-            game, player, move, monster_tile, replace_allowed=True
-        ).new_phase(Phase.fall_direction)
+        new_game = self._apply_place_tile(game, player, move, monster_tile, replace_allowed=True)
+
+        return self._check_falling(new_game, player_status)
 
     def fall_direction_fall(self, game: Game, player: PlayerColor, move: Fall) -> Game:
         # validate move
