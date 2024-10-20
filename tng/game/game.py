@@ -123,11 +123,7 @@ class Board(NamedTuple):
         if cell.tile is None:
             return False
 
-        for od in cell.open_directions():
-            if od is d:
-                return True
-
-        return False
+        return any(od is d for od in cell.open_directions())
 
     def drop_tiles(self, dropped_tiles: Iterable[Position]) -> 'Board':
         new_cells = list(self.cells)
