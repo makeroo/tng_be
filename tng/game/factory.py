@@ -96,7 +96,7 @@ class GameFactory:
                 for color in colors
             ],
             turn=0,
-            phase=Phase.place_start,
+            phases=[Phase.place_start],
             last_placed_tile_pos=Position(0, 0),
             decisions=[],
         )

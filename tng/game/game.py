@@ -197,18 +197,23 @@ class Game(NamedTuple):
 
     turn: int  # index in the players array
 
-    phase: Phase
+    phases: list[Phase]
 
     last_placed_tile_pos: Position
 
     decisions: list[Decision] | None
 
     def new_phase(self, phase: Phase) -> 'Game':
-        """
-        FSM check is up to TNGFSM, here we take the phase as it is.
-        """
+        return self._replace(phases=[*self.phases[:-1], phase])
 
-        return self._replace(phase=phase)
+    def push_phase(self, phase: Phase) -> 'Game':
+        return self._replace(phases=[*self.phases, phase])
+
+    def pop_phase(self) -> 'Game':
+        if not self.phases:
+            raise GameRuntimeError('no phases to pop')
+
+        return self._replace(phases=self.phases[:-1])
 
     def set_turn(self, turn: int) -> 'Game':
         return self._replace(turn=turn)
