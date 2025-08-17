@@ -21,20 +21,37 @@ class IllegalMove(ValueError):
     pass
 
 
-class TNGFSM:
-    def apply(self, game: Game, move: Move) -> Game:
-        handler = getattr(self, f'{game.phase.value}_{move.param.move.value}')
+class PhaseLogic:
+    def place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
 
-        return handler(game, move.player, move.param)
+    def rotate_tile(self, game: Game, player: PlayerColor, move: RotateTile) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
 
-    def place_start_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
-        return (
-            self._apply_place_tile(game, player, move, Tile.start, replace_allowed=False)
-            .new_phase(Phase.rotate_start)
-            .move_player(game.turn, move.pos)
-        )
+    def stay(self, game: Game, player: PlayerColor, move: Stay) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
 
-    def rotate_start_rotate_tile(self, game: Game, player: PlayerColor, move: RotateTile) -> Game:
+    def crawl(self, game: Game, player: PlayerColor, move: Crawl) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
+
+    def fall(self, game: Game, player: PlayerColor, move: Fall) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
+
+    def land(self, game: Game, player: PlayerColor, move: Land) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
+
+    def pass_key(self, game: Game, player: PlayerColor, move: PassKey) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
+
+    def block(self, game: Game, player: PlayerColor, move: Block) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
+
+    def charge(self, game: Game, player: PlayerColor, move: Charge) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
+
+    def spend_nerve(self, game: Game, player: PlayerColor, move: SpendNerve) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.phase}')
+
         # validate move
 
         player_status = game.players[game.turn]
