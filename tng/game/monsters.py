@@ -1,115 +1,93 @@
-from typing import Callable
+from collections import defaultdict
 
 from .game import Cell, Board
-from .types import Tile, Direction, is_monster, Position
+from .types import Tile, is_monster, Position, PlayerColor
 
 
-class VisibleMonsters:
+class AttackingMonsters:
     def __init__(self, board: Board) -> None:
         self.board = board
-        self.triggered_monsters: dict[Position, Cell] = {}
-        self.visited_coords: set[Position] = set()
 
-        self.hitten_cells: dict[Position, list[Tile]] = {}
+        # self.triggered_monsters: dict[Position, Cell] = {}
+        # self.visited_coords: set[Position] = set()
 
-    def add_monster(self, pos: Position) -> None:
-        self.triggered_monsters[pos] = self.board.at(pos)
+        # self.hitten_cells: dict[Position, list[Tile]] = {}
 
-    def _paint(
-        self,
-        monster: Tile,
-        calc_new_pos: Callable[[int], Position],
-        up_to: Position | None = None,
-    ) -> Position:
-        new_pos = Position(0, 0)
+    def trigger_monsters(self, player_moved_from: Position) -> dict[PlayerColor, list[Cell]]:
+        """
+        Look for monsters in the cell the player moved from and in any direction from it.
 
-        for d in range(self.board.edge_length - 1):
-            new_pos = calc_new_pos(-d)
+        Two phases:
+        1. find all monsters triggered by the player move
+        2. look for chain reactions
 
-            if new_pos == up_to:
-                break
+        Returns, for each player a list of monters that hit them.
+        """
 
-            dcell = self.board.at(new_pos)
+        r: dict[PlayerColor, list[Cell]] = defaultdict(list)
 
-            if dcell.tile in (None, Tile.pit):
-                break
+        # phase 1
 
-            self.hitten_cells.setdefault(new_pos, []).append(monster)
+        monster_queue: list[Position] = []
 
-        return new_pos
+        starting_cell = self.board.at(player_moved_from)
 
-    def cover_cells(self) -> None:
-        self.hitten_cells: dict[Position, list[Tile]] = {}
+        if starting_cell.tile is not None and is_monster[starting_cell.tile]:
+            monster_queue.append(player_moved_from)
 
-        for pos, cell in self.triggered_monsters.items():
+        for d in starting_cell.open_directions():
+            p = player_moved_from
+
+            while True:
+                p = d.neighbor(p, self.board.edge_length)
+
+                if p == player_moved_from:
+                    break
+
+                cell = self.board.at(p)
+
+                if cell.tile is None or cell.tile is Tile.pit:
+                    break
+
+                if is_monster[cell.tile]:
+                    monster_queue.append(p)
+                    break
+
+        # phase 2
+
+        examined_monsters: set[Position] = set()
+
+        while monster_queue:
+            pos = monster_queue.pop()
+
+            if pos in examined_monsters:
+                continue
+
+            examined_monsters.add(pos)
+
+            cell = self.board.at(pos)
+
             if cell.tile is None:
                 continue
 
-            up_to = self._paint(
-                cell.tile,
-                lambda d: pos.add(0, -d, self.board.edge_length),  # noqa: B023
-            )
+            for d in cell.open_directions():
+                p = pos
 
-            self._paint(
-                cell.tile,
-                lambda d: pos.add(0, d, self.board.edge_length),  # noqa: B023
-                up_to,
-            )
+                while True:
+                    p = d.neighbor(p, self.board.edge_length)
 
-            up_to = self._paint(
-                cell.tile,
-                lambda d: pos.add(-d, 0, self.board.edge_length),  # noqa: B023
-            )
+                    if p == pos:
+                        break
 
-            self._paint(
-                cell.tile,
-                lambda d: pos.add(d, 0, self.board.edge_length),  # noqa: B023
-                up_to,
-            )
+                    cell = self.board.at(p)
 
-    def hitting(self, pos: Position) -> list[Tile]:
-        return self.hitten_cells.get(pos, [])
+                    if cell.tile is None or cell.tile is Tile.pit:
+                        break
 
-    def check(self, pos: Position) -> None:
-        """
-        pos is either the position from which a player move or to which it landed
-        """
+                    if is_monster[cell.tile]:
+                        monster_queue.append(p)
 
-        starting_cell = self.board.at(pos)
+                    for player in cell.players:
+                        r[player].append(cell)
 
-        if starting_cell.tile is None:
-            return
-
-        queue: list[tuple[Position, Cell, Direction]] = [
-            (pos, starting_cell, d) for d in starting_cell.open_directions()
-        ]
-
-        while queue:
-            from_pos, from_cell, d = queue.pop()
-
-            if from_cell.tile is None:
-                continue
-
-            if not self.board.is_connected(from_pos, d):
-                continue
-
-            to_pos = d.neighbor(from_pos, self.board.edge_length)
-
-            if to_pos in self.visited_coords:
-                continue
-
-            self.visited_coords.add(to_pos)
-
-            to_cell = self.board.at(to_pos)
-
-            if to_cell.tile is None or to_cell.tile is Tile.pit:
-                continue
-
-            if is_monster[to_cell.tile]:
-                self.triggered_monsters[to_pos] = to_cell
-
-                queue.extend((to_pos, to_cell, next_d) for next_d in to_cell.open_directions())
-
-                continue
-
-            queue.append((to_pos, to_cell, d))
+        return r
