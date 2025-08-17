@@ -26,7 +26,16 @@ They are managed by FSM which uses several Game calls.
 from typing import NamedTuple, Iterable, Iterator
 from enum import Enum
 
-from .types import Tile, Direction, PlayerColor, Position, open_directions, FallDirection
+from .types import (
+    Tile,
+    Direction,
+    PlayerColor,
+    Position,
+    open_directions,
+    FallDirection,
+    is_crumbling,
+)
+from .moves import MoveType
 
 
 class GameRuntimeError(Exception):
