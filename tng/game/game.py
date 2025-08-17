@@ -173,6 +173,11 @@ class Phase(Enum):
     game_lost = 'game_lost'
     game_won = 'game_won'
 
+class Decision(NamedTuple):
+    player: PlayerColor
+    action: MoveType
+    order: int
+
 
 class Game(NamedTuple):
     board: Board
@@ -186,6 +191,8 @@ class Game(NamedTuple):
     phase: Phase
 
     last_placed_tile_pos: Position
+
+    decisions: list[Decision] | None
 
     def new_phase(self, phase: Phase) -> 'Game':
         """
@@ -400,3 +407,6 @@ class Game(NamedTuple):
         new_players[player_idx] = new_player_status
 
         return self._replace(players=new_players)
+
+    def add_decision(self, phase: Phase, decision: Decision) -> 'Game':
+        return self._replace(phase=phase, decisions=(self.decisions or []) + [decision])
