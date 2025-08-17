@@ -13,10 +13,10 @@ class MoveType(str, Enum):
     crawl = "crawl"
     fall = "fall"  # select either row or column
     land = "land"  # return on board
-    # TODO pass_key = "pass_key"
-    # TODO block = "block" # drop just 2 tiles instead of three, spending 1 nerve
-    # TODO charge = "charge" # move into a monster
-    # TODO sustain = "sustain" # during final flickers do not consume a tile, spending 1 nerve
+    pass_key = "pass_key"
+    block = "block"  # drop just 2 tiles instead of three, spending 1 nerve
+    charge = "charge"  # move into a monster
+    spend_nerve = "spend_nerve"
 
 
 class PlaceTile(BaseModel):
@@ -56,6 +56,26 @@ class Land(BaseModel):
     place: int
 
 
+class PassKey(BaseModel):
+    move: Literal[MoveType.pass_key]
+    player: PlayerColor
+
+
+class Block(BaseModel):
+    move: Literal[MoveType.block]
+
+
+class Charge(BaseModel):
+    move: Literal[MoveType.charge]
+    direction: Direction
+
+
+class SpendNerve(BaseModel):
+    move: Literal[MoveType.spend_nerve]
+
+
 class Move(BaseModel):
     player: PlayerColor
-    param: PlaceTile | RotateTile | Stay | Crawl | Fall | Land = Field(discriminator='move')
+    param: (
+        PlaceTile | RotateTile | Stay | Crawl | Fall | Land | PassKey | Block | Charge | SpendNerve
+    ) = Field(discriminator='move')
