@@ -66,7 +66,8 @@ class Tile(Enum):
     gate = "gate"
     wax_eater = "wax_eater"
     straight_passage = "straight_passage"
-    t_passage = "t_passage"  # FIXME just 2 are crumbling
+    t_passage = "t_passage"
+    crumbling_t_passage = "crumbling_t_passage"
     four_way_passage = "four_way_passage"
 
     pit = "pit"
@@ -79,6 +80,7 @@ is_crumbling = {
     Tile.wax_eater: False,
     Tile.straight_passage: True,
     Tile.t_passage: False,
+    Tile.crumbling_t_passage: True,
     Tile.four_way_passage: False,
     Tile.pit: False,
 }
@@ -90,6 +92,7 @@ is_monster = {
     Tile.wax_eater: True,
     Tile.straight_passage: False,
     Tile.t_passage: False,
+    Tile.crumbling_t_passage: False,
     Tile.four_way_passage: False,
     Tile.pit: False,
 }
