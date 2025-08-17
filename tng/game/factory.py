@@ -98,6 +98,7 @@ class GameFactory:
             turn=0,
             phase=Phase.place_start,
             last_placed_tile_pos=Position(0, 0),
+            decisions=[],
         )
 
         return g
