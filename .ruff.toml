@@ -1,0 +1,6 @@
+line-length = 100
+
+
+[format]
+# Like Black, use double quotes for strings.
+quote-style = "preserve"
