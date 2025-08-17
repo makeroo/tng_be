@@ -52,6 +52,19 @@ class PhaseLogic:
     def spend_nerve(self, game: Game, player: PlayerColor, move: SpendNerve) -> Game:
         raise IllegalMove(f'illegal move {move} in phase {game.phase}')
 
+
+class PlaceStart(PhaseLogic):
+    @override
+    def place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
+        g1 = apply_place_tile(game, player, move, Tile.start, replace_allowed=False)
+        g2 = g1.move_player(g1.turn, move.pos)
+
+        return g2.new_phase(Phase.rotate_start)
+
+
+class RotateStart(PhaseLogic):
+    @override
+    def rotate_tile(self, game: Game, player: PlayerColor, move: RotateTile) -> Game:
         # validate move
 
         player_status = game.players[game.turn]
@@ -64,43 +77,52 @@ class PhaseLogic:
         if player_status.pos is None:
             raise GameRuntimeError('player without pos')
 
-        game = game.place_tile(player_status.pos, Tile.start, move.direction)
+        g1 = game.place_tile(player_status.pos, Tile.start, move.direction)
 
-        cells = game.board.visible_cells_from(player_status.pos)
+        cells = g1.board.visible_cells_from(player_status.pos)
 
         if any(cell.tile is None for cell in cells):
-            return game.new_phase(Phase.discover_start_tiles)
+            return g1.new_phase(Phase.discover_start_tiles)
 
-        elif game.turn + 1 == len(game.players):
-            return game.new_phase(Phase.move_player).set_turn(0)
+        next_player = g1.turn + 1
 
-        else:
-            return game.new_phase(Phase.place_start).set_turn(game.turn + 1)
+        if next_player == len(game.players):
+            g2 = g1.set_turn(0)
 
-    def discover_start_tiles_place_tile(
-        self, game: Game, player: PlayerColor, move: PlaceTile
-    ) -> Game:
+            return g2.new_phase(Phase.move_player)
+
+        g2 = g1.set_turn(next_player)
+
+        return g2.new_phase(Phase.place_start)
+
+
+class DiscoverStartTiles(PhaseLogic):
+    @override
+    def place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
         # this is the start macro phase, there is no need
         # to check for bounds: there are surely tiles to draw
         placed_tile = game.tile_holder[game.draw_index]
 
-        game = self._apply_place_tile(
-            game, player, move, placed_tile, replace_allowed=False
-        ).draw_tile()
+        g1 = apply_place_tile(game, player, move, placed_tile, replace_allowed=False)
 
-        if placed_tile in [Tile.straight_passage, Tile.t_passage]:
-            return game.new_phase(Phase.rotate_discovered_start_tile)
+        g2 = g1.draw_tile()
 
-        start_pos = game.players[game.turn].pos
+        # FIXME: if there is one only available rotation force that and skip rotate_discovered_start_title phase
+
+        if placed_tile in [Tile.straight_passage, Tile.t_passage, Tile.crumbling_t_passage]:
+            return g2.new_phase(Phase.rotate_discovered_start_tile)
+
+        start_pos = g2.players[g2.turn].pos
 
         if start_pos is None:
             raise GameRuntimeError('current player without pos')
 
-        return self._next_from_discover_start_tiles(game, start_pos)
+        return next_from_discover_start_tiles(game, start_pos)
 
-    def rotate_discovered_start_tile_rotate_tile(
-        self, game: Game, player: PlayerColor, move: RotateTile
-    ) -> Game:
+
+class RotateDiscoveredStartTile(PhaseLogic):
+    @override
+    def rotate_tile(self, game: Game, player: PlayerColor, move: RotateTile) -> Game:
         # validate move
 
         player_status = game.players[game.turn]
@@ -125,7 +147,7 @@ class PhaseLogic:
 
         # apply
 
-        return self._next_from_discover_start_tiles(new_game, player_status.pos)
+        return next_from_discover_start_tiles(new_game, player_status.pos)
 
     def _next_from_discover_start_tiles(self, new_game: Game, start_pos: Position) -> Game:
         cells = new_game.board.visible_cells_from(start_pos)
