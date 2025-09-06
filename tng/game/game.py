@@ -210,7 +210,7 @@ class Game(NamedTuple):
         return self._replace(phases=[*self.phases, phase])
 
     def pop_phase(self) -> 'Game':
-        if not self.phases:
+        if len(self.phases) < 2:
             raise GameRuntimeError('no phases to pop')
 
         return self._replace(phases=self.phases[:-1])
