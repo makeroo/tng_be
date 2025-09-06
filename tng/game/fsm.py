@@ -321,6 +321,45 @@ class MovePlayer(PhaseLogic):
         return game.set_turn((game.turn + 1) % len(game.players))
 
 
+class PlaceMonster(PhaseLogic):
+    pass
+
+
+class PitsForm(PhaseLogic):
+    pass
+
+
+class Falling(PhaseLogic):
+    pass
+
+
+class TriggerMonsters(PhaseLogic):
+    pass
+
+
+class HitByMonsters(PhaseLogic):
+    pass
+
+
+class LightAndDarkness(PhaseLogic):
+    pass
+
+
+class HurryUp(PhaseLogic):
+    pass
+
+
+class FinalFlickers(PhaseLogic):
+    pass
+
+
+class GameWon(PhaseLogic):
+    pass
+
+
+class GameLost(PhaseLogic):
+    pass
+
 
 class TNGFSM:
     def __init__(self) -> None:
