@@ -215,6 +215,10 @@ class Game(NamedTuple):
 
         return self._replace(phases=self.phases[:-1])
 
+    @property
+    def current_phase(self) -> Phase:
+        return self.phases[-1]
+
     def set_turn(self, turn: int) -> 'Game':
         return self._replace(turn=turn)
 
