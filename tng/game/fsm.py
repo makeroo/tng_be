@@ -3,13 +3,29 @@ This module implements the TNG game logic.
 
 It:
 1. validates a move
-2. make that move returning the resulting game state.
+2. executes that move returning the resulting game state.
 """
 
-from .game import Game, Phase, GameRuntimeError, Player
-from .moves import Move, PlaceTile, RotateTile, Stay, Crawl, Fall, Land
-from .types import PlayerColor, Tile, Direction, is_crumbling, is_monster, FallDirection, Position
-from .monsters import VisibleMonsters
+from typing import override
+
+from .game import Game, Phase, GameRuntimeError, Player, Decision
+from .moves import (
+    Move,
+    PlaceTile,
+    RotateTile,
+    Stay,
+    Crawl,
+    Fall,
+    Land,
+    PassKey,
+    Charge,
+    Block,
+    SpendNerve,
+    DiscardTile,
+    MoveType,
+)
+from .types import PlayerColor, Tile, Direction, is_monster, FallDirection, Position, is_crumbling
+from .monsters import AttackingMonsters
 
 
 # TODO: check that game has ended
