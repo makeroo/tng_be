@@ -394,7 +394,7 @@ class TNGFSM:
             return self._apply_sub_phase_complete(game, move)
 
     def _apply(self, game: Game, move: Move) -> Game:
-        logic = self.phases[game.phases[-1]]
+        logic = self.phases[game.current_phase]
 
         handler = getattr(logic, move.param.move.value)
 
@@ -406,7 +406,7 @@ class TNGFSM:
         if not g1.phases:
             raise GameRuntimeError('no subphase running')
 
-        logic = self.phases[g1.phases[-1]]
+        logic = self.phases[g1.current_phase]
 
         return logic.sub_phase_complete(g1, move.player, move.param)
 
