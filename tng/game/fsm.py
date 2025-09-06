@@ -268,24 +268,6 @@ class TNGFSM:
 
         return logic.sub_phase_complete(g1, move.player, move.param)
 
-    def _check_falling(self, game: Game, player_status: Player):
-        if player_status.pos is None:
-            raise GameRuntimeError('player without pos')
-
-        player_cell = game.board.at(player_status.pos)
-
-        if player_cell.tile is None:
-            raise GameRuntimeError('player\'s cell has no tile')
-
-        if is_crumbling[player_cell.tile]:
-            game = game.change_to_pit(player_status.pos).player_falls(game.turn)
-
-            return game.new_phase(Phase.fall_direction)
-
-        game = game.set_turn(turn=(game.turn + 1) % len(game.players))
-
-        return game
-
     def place_monster_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
         player_status = game.players[game.turn]
 
@@ -621,3 +603,22 @@ def next_from_discover_tiles(game: Game, start_pos: Position) -> Game:
     # g1 = game.set_turn(next_player)
 
     # return g1.new_phase(Phase.place_start)
+
+
+def check_falling(game: Game, player_status: Player) -> tuple[Game, bool]:
+    if player_status.pos is None:
+        raise GameRuntimeError('player without pos')
+
+    player_cell = game.board.at(player_status.pos)
+
+    if player_cell.tile is None:
+        raise GameRuntimeError('player\'s cell has no tile')
+
+    if is_crumbling[player_cell.tile]:
+        return (
+            game.place_tile(player_status.pos, Tile.pit)
+            .player_falls(game.turn)
+            .new_phase(Phase.falling)
+        ), True
+
+    return game, False  # .set_turn(turn=(game.turn + 1) % len(game.players))
