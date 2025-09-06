@@ -17,6 +17,7 @@ class MoveType(str, Enum):
     block = "block"  # drop just 2 tiles instead of three, spending 1 nerve
     charge = "charge"  # move into a monster
     spend_nerve = "spend_nerve"
+    discard_tile = "discard_tile"  # last action of the turn during the final flickers
 
 
 class PlaceTile(BaseModel):
@@ -74,8 +75,23 @@ class SpendNerve(BaseModel):
     move: Literal[MoveType.spend_nerve]
 
 
+class DiscardTile(BaseModel):
+    move: Literal[MoveType.discard_tile]
+    pos: Position
+
+
 class Move(BaseModel):
     player: PlayerColor
     param: (
-        PlaceTile | RotateTile | Stay | Crawl | Fall | Land | PassKey | Block | Charge | SpendNerve
+        PlaceTile
+        | RotateTile
+        | Stay
+        | Crawl
+        | Fall
+        | Land
+        | PassKey
+        | Block
+        | Charge
+        | SpendNerve
+        | DiscardTile
     ) = Field(discriminator='move')
