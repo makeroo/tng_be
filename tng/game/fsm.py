@@ -365,9 +365,9 @@ class TNGFSM:
     def __init__(self) -> None:
         self.phases = {
             Phase.place_start: PlaceStart(),
-            Phase.rotate_start: RotateStart(),
-            Phase.discover_start_tiles: DiscoverStartTiles(),
-            Phase.rotate_discovered_start_tile: RotateDiscoveredStartTile(),
+            Phase.rotate_placed: RotatePlaced(),
+            Phase.discover_tiles: DiscoverTiles(),
+            Phase.rotate_discovered_tile: RotateDiscoveredTile(),
             Phase.landing: Landing(),
             Phase.move_player: MovePlayer(),
             Phase.place_monster: PlaceMonster(),
@@ -376,8 +376,6 @@ class TNGFSM:
             Phase.trigger_monsters: TriggerMonsters(),
             Phase.hit_by_monsters: HitByMonsters(),
             Phase.light_and_darkness: LightAndDarkness(),
-            Phase.discover_tiles: DiscoverTiles(),
-            Phase.rotate_discovered_tile: RotateDiscoveredTile(),
             Phase.hurry_up: HurryUp(),
             Phase.final_flickers: FinalFlickers(),
             Phase.game_lost: GameLost(),
