@@ -21,6 +21,13 @@ class IllegalMove(ValueError):
     pass
 
 
+class SubphaseComplete(Exception):
+    def __init__(self, game: Game) -> None:
+        super().__init__()
+
+        self.game = game
+
+
 class PhaseLogic:
     def place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
         raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
