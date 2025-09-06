@@ -272,9 +272,6 @@ class Game(NamedTuple):
 
         return self._replace(players=new_players)
 
-    def change_to_pit(self, pos: Position) -> 'Game':
-        return self._replace(board=self.board.place_tile(pos, Tile.pit))
-
     def player_falls(self, player_idx: int) -> 'Game':
         player_status = self.players[player_idx]
 
