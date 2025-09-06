@@ -175,9 +175,8 @@ class RotateDiscoveredTile(PhaseLogic):
 class Landing(PhaseLogic):
 
         else:
-            return new_game.new_phase(Phase.place_start).set_turn(new_game.turn + 1)
-
-    def move_player_stay(self, game: Game, player: PlayerColor, move: Stay) -> Game:
+class MovePlayer(PhaseLogic):
+    def stay(self, game: Game, player: PlayerColor, move: Stay) -> Game:
         player_status = game.players[game.turn]
 
         if player_status.color != player:
@@ -191,24 +190,34 @@ class Landing(PhaseLogic):
 
         # apply
 
-        if game.final_flickers():
-            # TODO: final flickers
-            raise NotImplementedError('final flickers')
-
         if not player_status.has_light:
-            game = game.change_nerves(game.turn, -1)
+            g1 = game.change_nerves(game.turn, -1)
 
         elif player_status.nerves < 2:
-            game = game.change_nerves(game.turn, +1)
+            g1 = game.change_nerves(game.turn, +1)
 
-        drawn_tile = game.tile_holder[game.draw_index]
+        else:
+            g1 = game
 
-        game = game.draw_tile()
+        drawn_tile = g1.tile_holder[game.draw_index]
+
+        g2 = g1.draw_tile()
 
         if is_monster[drawn_tile]:
-            return game.new_phase(Phase.place_monster)
+            return g2.push_phase(Phase.place_monster)
 
-        return self._check_falling(game, player_status)
+        g3, fallen = check_falling(game, player_status)
+
+        if g3.final_flickers():
+            if fallen:
+                # TODO: detect game lost if both column and row have empty tiles
+                return g3.new_phase(Phase.falling)
+
+            else:
+                return g3.new_phase(Phase.final_flickers)
+
+        return g3.set_turn(turn=(game.turn + 1) % len(game.players))
+
 
 class TNGFSM:
     def __init__(self) -> None:
