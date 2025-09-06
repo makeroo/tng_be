@@ -218,6 +218,109 @@ class MovePlayer(PhaseLogic):
 
         return g3.set_turn(turn=(game.turn + 1) % len(game.players))
 
+    def crawl(self, game: Game, player: PlayerColor, move: Crawl) -> Game:
+        # TODO: sono fermo qua
+        # ho capito la VisibleMonster ma questo metodo va tutto ripensato
+
+        # validate move
+
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        if player_status.falling:
+            raise IllegalMove('falling player')
+
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
+
+        player_cell = game.board.at(player_status.pos)
+
+        if move.direction not in player_cell.open_directions():
+            raise IllegalMove('illegal direction')
+
+        dest_pos = game.board.dest_coords(player_status.pos, move.direction)
+
+        dest_cell = game.board.at(dest_pos)
+
+        if dest_cell.tile is None:
+            if player_status.has_light:
+                raise GameRuntimeError('empty tile that shouldn\'t')
+
+            if game.final_flickers():
+                raise IllegalMove('empty dest tile')
+
+        elif len(dest_cell.players) > 0 and dest_cell.tile is not Tile.gate:
+            raise IllegalMove('dest tile already occupied')
+
+        # apply
+
+        new_game = game.move_player(game.turn, dest_pos)
+
+        if dest_cell.tile is None:
+            # lights out
+            drawn_tile = new_game.tile_holder[new_game.draw_index]
+
+            new_game = new_game.draw_tile().place_tile(dest_pos, drawn_tile)
+
+            if is_monster[drawn_tile]:
+                new_game.add_decision(
+                    Phase.monster_attack, Decision(player_status.color, MoveType.crawl, 2)
+                )
+
+        else:
+            drawn_tile = None
+
+        # we calc visible monsters on the NEW table because if the player was in a crumbling tile
+        # and moves the opposite way of a monster, that monster will be triggered but the
+        # moving player will remain unaffected
+
+        monsters = VisibleMonsters(new_game.board)
+
+        monsters.check(player_status.pos)
+        monsters.check(dest_pos)
+
+        new_game = self._activate_monsters(new_game, monsters)
+
+        # if player_cell.tile is None:
+        #     raise GameRuntimeError('player\'s cell has no tile')
+
+        if drawn_tile in [Tile.t_passage, Tile.straight_passage]:
+            return game.new_phase(Phase.lights_out_rotate)
+
+        new_player_status = game.players[game.turn]
+
+        if new_player_status.falling:
+            game = game.new_phase(Phase.fall_direction)
+
+            game = self._activate_monsters(game, monsters)
+
+            return game
+
+        if new_player_status.has_light:
+            game = game.relight_near_players(new_player_status)
+
+        else:
+            game = game.relight_me(new_player_status)
+
+            new_player_status = game.players[game.turn]
+
+        if new_player_status.pos is None:
+            raise GameRuntimeError('moved player lost pos')
+
+        # monsters.check(new_player_status.pos)
+
+        game = self._activate_monsters(game, monsters)
+
+        cells = game.board.visible_cells_from(new_player_status.pos)
+
+        if any(cell.tile is None for cell in cells):
+            return game.new_phase(Phase.discover_tiles)
+
+        return game.set_turn((game.turn + 1) % len(game.players))
+
+
 
 class TNGFSM:
     def __init__(self) -> None:
@@ -297,82 +400,6 @@ class TNGFSM:
             .set_turn(turn=(game.turn + 1) % len(game.players))
             .new_phase(Phase.move_player)
         )
-
-    def move_player_crawl(self, game: Game, player: PlayerColor, move: Crawl) -> Game:
-        # validate move
-
-        player_status = game.players[game.turn]
-
-        if player_status.color != player:
-            raise IllegalMove('not player turn')
-
-        if player_status.falling:
-            raise IllegalMove('falling player')
-
-        if player_status.pos is None:
-            raise GameRuntimeError('player without pos')
-
-        player_cell = game.board.at(player_status.pos)
-
-        if move.direction not in player_cell.open_directions():
-            raise IllegalMove('illegal direction')
-
-        dest_pos = game.board.dest_coords(player_status.pos, move.direction)
-
-        dest_cell = game.board.at(dest_pos)
-
-        if dest_cell.tile is None:
-            if player_status.has_light:
-                raise GameRuntimeError('empty tile that shouldn\'t')
-
-            if game.final_flickers():
-                raise IllegalMove('empty dest tile')
-
-        elif len(dest_cell.players) > 0 and dest_cell.tile is not Tile.gate:
-            raise IllegalMove('dest tile already occupied')
-
-        # apply
-
-        monsters = VisibleMonsters(game.board)
-
-        monsters.check(player_status.pos)
-
-        new_game = game.move_player(game.turn, dest_pos)
-
-        if player_cell.tile is None:
-            raise GameRuntimeError('player\'s cell has no tile')
-
-        if is_crumbling[player_cell.tile]:
-            new_game = new_game.change_to_pit(player_status.pos)
-
-        new_player_status = new_game.players[new_game.turn]
-
-        if new_player_status.falling:
-            new_game = new_game.new_phase(Phase.fall_direction)
-
-            new_game = self._activate_monsters(new_game, monsters)
-
-            return new_game
-
-        if new_player_status.has_light:
-            new_game = new_game.relight_near_players(new_player_status)
-
-        else:
-            new_game = new_game.relight_me(new_player_status)
-
-        if new_player_status.pos is None:
-            raise GameRuntimeError('moved player lost pos')
-
-        monsters.check(new_player_status.pos)
-
-        new_game = self._activate_monsters(new_game, monsters)
-
-        cells = new_game.board.visible_cells_from(new_player_status.pos)
-
-        if any(cell.tile is None for cell in cells):
-            return new_game.new_phase(Phase.discover_tiles)
-
-        return new_game.set_turn((game.turn + 1) % len(game.players))
 
     def _activate_monsters(self, game: Game, monsters: VisibleMonsters) -> Game:
         if not monsters.triggered_monsters:
