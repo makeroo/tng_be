@@ -78,6 +78,11 @@ class PlaceStart(PhaseLogic):
 
 
 class RotatePlaced(PhaseLogic):
+    """
+    Sub FSM started whenever a player lands on the board, either at the start or
+    landing after a fall.
+    """
+
     @override
     def rotate_tile(self, game: Game, player: PlayerColor, move: RotateTile) -> Game:
         # validate move
