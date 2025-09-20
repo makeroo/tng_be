@@ -8,7 +8,7 @@ It:
 
 from typing import override
 
-from .game import Game, Phase, GameRuntimeError, Player, Decision
+from .game import Cell, Game, Phase, GameRuntimeError, Player, Decision
 from .moves import (
     Move,
     PlaceTile,
@@ -18,9 +18,9 @@ from .moves import (
     Fall,
     Land,
     PassKey,
-    Charge,
+    Sustain,
     Block,
-    SpendNerve,
+    MoveAgain,
     DiscardTile,
     MoveType,
 )
@@ -66,16 +66,16 @@ class PhaseLogic:
     def pass_key(self, game: Game, player: PlayerColor, move: PassKey) -> Game:
         raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
 
+    def discard_tile(self, game: Game, player: PlayerColor, move: DiscardTile) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
+
     def block(self, game: Game, player: PlayerColor, move: Block) -> Game:
         raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
 
-    def charge(self, game: Game, player: PlayerColor, move: Charge) -> Game:
+    def sustain(self, game: Game, player: PlayerColor, move: Sustain) -> Game:
         raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
 
-    def spend_nerve(self, game: Game, player: PlayerColor, move: SpendNerve) -> Game:
-        raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
-
-    def discard_tile(self, game: Game, player: PlayerColor, move: DiscardTile) -> Game:
+    def move_again(self, game: Game, player: PlayerColor, move: MoveAgain) -> Game:
         raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
 
     def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
