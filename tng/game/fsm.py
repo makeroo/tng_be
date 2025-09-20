@@ -348,28 +348,25 @@ class PlaceMonster(PhaseLogic):
     pass
 
 
-class PitsForm(PhaseLogic):
-    pass
+# class PitsForm(PhaseLogic):
+#     pass
 
 
 class Falling(PhaseLogic):
-    pass
+# class TriggerMonsters(PhaseLogic):
+#     pass
 
 
-class TriggerMonsters(PhaseLogic):
-    pass
+# class HitByMonsters(PhaseLogic):
+#     pass
 
 
-class HitByMonsters(PhaseLogic):
-    pass
+# class LightAndDarkness(PhaseLogic):
+#     pass
 
 
-class LightAndDarkness(PhaseLogic):
-    pass
-
-
-class HurryUp(PhaseLogic):
-    pass
+# class HurryUp(PhaseLogic):
+#     pass
 
 
 class FinalFlickers(PhaseLogic):
@@ -394,12 +391,12 @@ class TNGFSM:
             Phase.landing: Landing(),
             Phase.move_player: MovePlayer(),
             Phase.place_monster: PlaceMonster(),
-            Phase.pits_form: PitsForm(),
+            # Phase.pits_form: PitsForm(),
             Phase.falling: Falling(),
-            Phase.trigger_monsters: TriggerMonsters(),
-            Phase.hit_by_monsters: HitByMonsters(),
-            Phase.light_and_darkness: LightAndDarkness(),
-            Phase.hurry_up: HurryUp(),
+            # Phase.trigger_monsters: TriggerMonsters(),
+            # Phase.hit_by_monsters: HitByMonsters(),
+            # Phase.light_and_darkness: LightAndDarkness(),
+            # Phase.hurry_up: HurryUp(),
             Phase.final_flickers: FinalFlickers(),
             Phase.game_lost: GameLost(),
             Phase.game_won: GameWon(),
@@ -431,213 +428,137 @@ class TNGFSM:
 
         return logic.sub_phase_complete(g1, move.player, move.param)
 
-    def place_monster_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
-        player_status = game.players[game.turn]
+    # def place_monster_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
+    #     player_status = game.players[game.turn]
 
-        if player_status.color != player:
-            raise IllegalMove('not player turn')
+    #     if player_status.color != player:
+    #         raise IllegalMove('not player turn')
 
-        # apply
+    #     # apply
 
-        monster_tile = game.tile_holder[game.draw_index - 1]
+    #     monster_tile = game.tile_holder[game.draw_index - 1]
 
-        new_game = self._apply_place_tile(game, player, move, monster_tile, replace_allowed=True)
+    #     new_game = self._apply_place_tile(game, player, move, monster_tile, replace_allowed=True)
 
-        return self._check_falling(new_game, player_status)
+    #     return check_falling(new_game, player_status)
 
-    def fall_direction_fall(self, game: Game, player: PlayerColor, move: Fall) -> Game:
-        # validate move
+    # def discover_tiles_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
+    #     # validate
 
-        player_status = game.players[game.turn]
+    #     player_status = game.players[game.turn]
 
-        if player_status.color != player:
-            raise IllegalMove('not player turn')
+    #     # checked in the _apply_place_tile
+    #     # if player_status.color != player:
+    #     #     raise IllegalMove('not player turn')
 
-        # apply
+    #     if game.final_flickers():
+    #         # TODO: set game lost phase at the previous move
+    #         raise IllegalMove('final flickres')
 
-        return (
-            game.fall_direction(game.turn, move.direction)
-            .set_turn(turn=(game.turn + 1) % len(game.players))
-            .new_phase(Phase.move_player)
-        )
+    #     # apply
 
-    def _activate_monsters(self, game: Game, monsters: VisibleMonsters) -> Game:
-        if not monsters.triggered_monsters:
-            return game
+    #     placed_tile = game.tile_holder[game.draw_index]
 
-        monsters.cover_cells()
+    #     new_game = self._apply_place_tile(
+    #         game, player, move, placed_tile, replace_allowed=False
+    #     ).draw_tile()
 
-        for p in game.players:
-            if p.falling or p.pos is None:
-                continue
+    #     if placed_tile in (Tile.t_passage, Tile.straight_passage):
+    #         return new_game.new_phase(Phase.rotate_discovered_tile)
 
-            hitting_monsters = monsters.hitting(p.pos)
+    #     if player_status.pos is None:
+    #         raise GameRuntimeError('player without pos')
 
-            for monster in hitting_monsters:
-                game = self._monster_attack(game, monster, p)
+    #     cells = new_game.board.visible_cells_from(player_status.pos)
 
-        return game
+    #     if any(cell.tile is None for cell in cells):
+    #         return new_game.new_phase(Phase.discover_tiles)
 
-    def _monster_attack(self, game: Game, monster: Tile, player_status: Player) -> Game:
-        if monster == Tile.wax_eater:
-            return game.draw_tiles(3).light_out(player_status)
+    #     return new_game.new_phase(Phase.move_player).set_turn((game.turn + 1) % len(game.players))
 
-        else:
-            raise GameRuntimeError(f'unknown monster {monster}')
+    # def rotate_discovered_tile_rotate_tile(
+    #     self, game: Game, player: PlayerColor, move: RotateTile
+    # ) -> Game:
+    #     # validate move
 
-    def move_player_land(self, game: Game, player: PlayerColor, move: Land) -> 'Game':
-        # validate
+    #     player_status = game.players[game.turn]
 
-        player_status = game.players[game.turn]
+    #     if player_status.color != player:
+    #         raise IllegalMove('not player turn')
 
-        if player_status.color != player:
-            raise IllegalMove('not player turn')
+    #     if player_status.pos is None:
+    #         raise GameRuntimeError('player without pos')
 
-        if move.place < 0 or move.place >= game.board.edge_length:
-            raise IllegalMove('out of bounds')
+    #     last_placed_cell = game.board.at(game.last_placed_tile_pos)
 
-        if player_status.pos is None:
-            raise GameRuntimeError('player without pos')
+    #     if last_placed_cell.tile is None:
+    #         raise GameRuntimeError('empty cell')
 
-        if player_status.fall_direction is FallDirection.column:
-            pos = Position(player_status.pos.x, move.place)
+    #     new_game = game.place_tile(game.last_placed_tile_pos, last_placed_cell.tile, move.direction)
 
-        elif player_status.fall_direction is FallDirection.row:
-            pos = Position(move.place, player_status.pos.y)
+    #     if player_status.pos not in new_game.board.visible_cells_coords_from(
+    #         new_game.last_placed_tile_pos
+    #     ):
+    #         raise IllegalMove('not_connected')
 
-        else:
-            raise GameRuntimeError(f'unknown player fall direction {player_status.fall_direction}')
+    #     # apply
 
-        cell = game.board.at(pos)
+    #     cells = new_game.board.visible_cells_from(player_status.pos)
 
-        if cell.tile is not None and (
-            (
-                player_status.fall_direction is FallDirection.column
-                and any(
-                    game.board.at(Position(ccrow, player_status.pos.y)).tile is None
-                    for ccrow in range(game.board.edge_length)
-                )
-                or any(
-                    game.board.at(Position(player_status.pos.x, cccol)).tile is None
-                    for cccol in range(game.board.edge_length)
-                )
-            )
-        ):
-            raise IllegalMove('tile not empty')
+    #     if any(cell.tile is None for cell in cells):
+    #         return new_game.new_phase(Phase.discover_tiles)
 
-        if game.final_flickers():
-            # TODO: calc at the end of the previous move
-            raise IllegalMove('game ended in loss')
+    #     return new_game.new_phase(Phase.move_player).set_turn(
+    #         (new_game.turn + 1) % len(new_game.players)
+    #     )
 
-        # apply
+    # def lights_out_rotate_rotate_tile(
+    #     self, game: Game, player: PlayerColor, move: RotateTile
+    # ) -> Game:
+    #     # validate move
 
-        if cell.tile is None:
-            drawn_tile = game.tile_holder[game.draw_index]
+    #     player_status = game.players[game.turn]
 
-            new_game = game.draw_tile().place_tile(pos, drawn_tile).move_player(game.turn, pos)
+    #     if player_status.color != player:
+    #         raise IllegalMove('not player turn')
 
-            if drawn_tile in (Tile.straight_passage, Tile.t_passage):
-                return game.new_phase(Phase.drop_on_tile)
+    #     if player_status.pos is None:
+    #         raise GameRuntimeError('player without pos')
 
-            if is_monster[drawn_tile]:
-                monsters = VisibleMonsters(new_game.board)
+    #     last_placed_cell = game.board.at(game.last_placed_tile_pos)
 
-                monsters.add_monster(pos)
+    #     if last_placed_cell.tile is None:
+    #         raise GameRuntimeError('empty cell')
 
-                monsters.check(pos)
+    #     new_game = game.place_tile(game.last_placed_tile_pos, last_placed_cell.tile, move.direction)
 
-                new_game = self._activate_monsters(new_game, monsters)
+    #     if player_status.pos not in new_game.board.visible_cells_coords_from(
+    #         new_game.last_placed_tile_pos
+    #     ):
+    #         raise IllegalMove('not_connected')
 
-                # TODO: new phase: force dropped player to crawl away
+    #     # apply
 
-                return new_game
+    #     new_game = new_game.relight_me(player_status)
 
-            cells = new_game.board.visible_cells_from(pos)
+    #     player_status = new_game.players[game.turn]
 
-            if any(cell.tile is None for cell in cells):
-                return new_game.new_phase(Phase.discover_tiles)
+    #     monsters = VisibleMonsters(new_game.board)
 
-            return new_game.new_phase(Phase.move_player).set_turn(
-                (game.turn + 1) % len(game.players)
-            )
+    #     if player_status.pos is None:
+    #         raise GameRuntimeError('player without pos')
 
-        new_game = game.move_player(game.turn, pos)
+    #     monsters.check(player_status.pos)
 
-        monsters = VisibleMonsters(new_game.board)
+    #     new_game = activate_monsters(new_game, monsters)
 
-        new_game = self._activate_monsters(new_game, monsters)
+    #     cells = new_game.board.visible_cells_from(player_status.pos)
 
-        return new_game
+    #     if any(cell.tile is None for cell in cells):
+    #         return new_game.new_phase(Phase.discover_tiles)
 
-    def discover_tiles_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
-        # validate
+    #     return new_game.new_phase(Phase.move_player).set_turn((game.turn + 1) % len(game.players))
 
-        player_status = game.players[game.turn]
-
-        # checked in the _apply_place_tile
-        # if player_status.color != player:
-        #     raise IllegalMove('not player turn')
-
-        if game.final_flickers():
-            # TODO: set game lost phase at the previous move
-            raise IllegalMove('final flickres')
-
-        # apply
-
-        placed_tile = game.tile_holder[game.draw_index]
-
-        new_game = self._apply_place_tile(
-            game, player, move, placed_tile, replace_allowed=False
-        ).draw_tile()
-
-        if placed_tile in (Tile.t_passage, Tile.straight_passage):
-            return new_game.new_phase(Phase.rotate_discovered_tile)
-
-        if player_status.pos is None:
-            raise GameRuntimeError('player without pos')
-
-        cells = new_game.board.visible_cells_from(player_status.pos)
-
-        if any(cell.tile is None for cell in cells):
-            return new_game.new_phase(Phase.discover_tiles)
-
-        return new_game.new_phase(Phase.move_player).set_turn((game.turn + 1) % len(game.players))
-
-    def rotate_discovered_tile_rotate_tile(
-        self, game: Game, player: PlayerColor, move: RotateTile
-    ) -> Game:
-        # validate move
-
-        player_status = game.players[game.turn]
-
-        if player_status.color != player:
-            raise IllegalMove('not player turn')
-
-        if player_status.pos is None:
-            raise GameRuntimeError('player without pos')
-
-        last_placed_cell = game.board.at(game.last_placed_tile_pos)
-
-        if last_placed_cell.tile is None:
-            raise GameRuntimeError('empty cell')
-
-        new_game = game.place_tile(game.last_placed_tile_pos, last_placed_cell.tile, move.direction)
-
-        if player_status.pos not in new_game.board.visible_cells_coords_from(
-            new_game.last_placed_tile_pos
-        ):
-            raise IllegalMove('not_connected')
-
-        # apply
-
-        cells = new_game.board.visible_cells_from(player_status.pos)
-
-        if any(cell.tile is None for cell in cells):
-            return new_game.new_phase(Phase.discover_tiles)
-
-        return new_game.new_phase(Phase.move_player).set_turn(
-            (new_game.turn + 1) % len(new_game.players)
-        )
 
 def apply_place_tile(
     game: Game, player: PlayerColor, move: PlaceTile, tile: Tile, *, replace_allowed: bool
