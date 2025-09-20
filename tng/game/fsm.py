@@ -703,11 +703,7 @@ def check_falling(game: Game, player_status: Player) -> tuple[Game, bool]:
         raise GameRuntimeError('player\'s cell has no tile')
 
     if is_crumbling[player_cell.tile]:
-        return (
-            game.place_tile(player_status.pos, Tile.pit)
-            .player_falls(game.turn)
-            .new_phase(Phase.falling)
-        ), True
+        return (game.place_tile(player_status.pos, Tile.pit).player_falls(game.turn)), True
 
     return game, False  # .set_turn(turn=(game.turn + 1) % len(game.players))
 
