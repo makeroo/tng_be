@@ -710,6 +710,43 @@ def check_falling(game: Game, player_status: Player) -> tuple[Game, bool]:
         ), True
 
     return game, False  # .set_turn(turn=(game.turn + 1) % len(game.players))
+
+
+def activate_monsters(game: Game, attacks: dict[PlayerColor, list[Cell]]) -> Game:
+    if not attacks:
+        return game
+
+    for p in game.players:
+        hitting_monsters = attacks.get(p.color)
+
+        if not hitting_monsters:
+            continue
+
+        for monster in hitting_monsters:
+            monster_tile = monster.tile
+
+            if monster_tile is None:
+                raise GameRuntimeError('monster cell without tile')
+
+            game = monster_attack(game, monster_tile, p)
+
+    return game
+
+
+def monster_attack(game: Game, monster: Tile, player_status: Player) -> Game:
+    if monster == Tile.wax_eater:
+        if player_status.nerves > 0:
+            return game.add_decision(
+                Decision(player_status.color, MoveType.block, 1),
+            )
+
+        else:
+            return game.draw_tiles(3).light_out(player_status)
+
+    else:
+        raise GameRuntimeError(f'unknown monster {monster}')
+
+
 def enlighted_cells(game: Game) -> set[Position]:
     visible_cells: set[Position] = set()
 
