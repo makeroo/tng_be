@@ -682,15 +682,6 @@ def next_from_discover_tiles(game: Game, start_pos: Position) -> Game:
         return game.new_phase(Phase.discover_tiles)
 
     raise SubphaseComplete(game)
-    # next_player = game.turn + 1
-
-    # if next_player == len(game.players):
-    #     g1 = game.set_turn(0)
-    #     return g1.new_phase(Phase.move_player)
-
-    # g1 = game.set_turn(next_player)
-
-    # return g1.new_phase(Phase.place_start)
 
 
 def check_falling(game: Game, player_status: Player) -> tuple[Game, bool]:
@@ -705,7 +696,7 @@ def check_falling(game: Game, player_status: Player) -> tuple[Game, bool]:
     if is_crumbling[player_cell.tile]:
         return (game.place_tile(player_status.pos, Tile.pit).player_falls(game.turn)), True
 
-    return game, False  # .set_turn(turn=(game.turn + 1) % len(game.players))
+    return game, False
 
 
 def activate_monsters(game: Game, attacks: dict[PlayerColor, list[Cell]]) -> Game:
