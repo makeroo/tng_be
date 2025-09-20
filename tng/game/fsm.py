@@ -234,7 +234,7 @@ class MovePlayer(PhaseLogic):
         if g3.final_flickers():
             if fallen:
                 # TODO: detect game lost if both column and row have empty tiles
-                return g3.new_phase(Phase.falling)
+                return g3.push_phase(Phase.falling)
 
             else:
                 return g3.new_phase(Phase.final_flickers)
@@ -242,9 +242,6 @@ class MovePlayer(PhaseLogic):
         return g3.set_turn(turn=(game.turn + 1) % len(game.players))
 
     def crawl(self, game: Game, player: PlayerColor, move: Crawl) -> Game:
-        # TODO: sono fermo qua
-        # ho capito la VisibleMonster ma questo metodo va tutto ripensato
-
         # validate move
 
         player_status = game.players[game.turn]
@@ -260,6 +257,9 @@ class MovePlayer(PhaseLogic):
 
         player_cell = game.board.at(player_status.pos)
 
+        if player_cell.tile is None:
+            raise GameRuntimeError('player\'s cell has no tile')
+
         if move.direction not in player_cell.open_directions():
             raise IllegalMove('illegal direction')
 
@@ -272,76 +272,88 @@ class MovePlayer(PhaseLogic):
                 raise GameRuntimeError('empty tile that shouldn\'t')
 
             if game.final_flickers():
-                raise IllegalMove('empty dest tile')
+                if any(
+                    cell.tile is not None
+                    for cell in game.board.visible_cells_from(player_status.pos)
+                ):
+                    raise IllegalMove('empty dest tile')
+
+                return game.new_phase(Phase.game_lost)
 
         elif len(dest_cell.players) > 0 and dest_cell.tile is not Tile.gate:
             raise IllegalMove('dest tile already occupied')
 
         # apply
 
-        new_game = game.move_player(game.turn, dest_pos)
+        g1 = game.move_player(game.turn, dest_pos)
+
+        if is_crumbling[player_cell.tile]:
+            g2 = g1.place_tile(player_status.pos, Tile.pit)
+        else:
+            g2 = g1
+
+        if dest_cell.tile == Tile.pit:
+            return g2.player_falls(game.turn).push_phase(Phase.falling)
 
         if dest_cell.tile is None:
             # lights out
-            drawn_tile = new_game.tile_holder[new_game.draw_index]
+            drawn_tile = g2.tile_holder[g2.draw_index]
 
-            new_game = new_game.draw_tile().place_tile(dest_pos, drawn_tile)
+            g3 = g2.draw_tile().place_tile(dest_pos, drawn_tile)
 
             if is_monster[drawn_tile]:
-                new_game.add_decision(
-                    Phase.monster_attack, Decision(player_status.color, MoveType.crawl, 2)
+                # this is a move, not a decision, but from the
+                # f/e pov both actions (nerves and moving) are to be taken
+                # at once, therefore I use this mechanism on the b/e
+                g3.add_decision(
+                    Decision(player_status.color, MoveType.crawl, 2),
                 )
 
         else:
             drawn_tile = None
 
+            g3 = g2
+
         # we calc visible monsters on the NEW table because if the player was in a crumbling tile
         # and moves the opposite way of a monster, that monster will be triggered but the
         # moving player will remain unaffected
 
-        monsters = VisibleMonsters(new_game.board)
+        monsters = AttackingMonsters(g3.board)
 
-        monsters.check(player_status.pos)
-        monsters.check(dest_pos)
+        attacks = monsters.trigger_monsters(player_status.pos)
 
-        new_game = self._activate_monsters(new_game, monsters)
+        g4 = activate_monsters(g3, attacks)
 
-        # if player_cell.tile is None:
-        #     raise GameRuntimeError('player\'s cell has no tile')
+        if g4.decisions:
+            return g4
+
+        g5 = refresh_lighting(g4)
 
         if drawn_tile in [Tile.t_passage, Tile.straight_passage]:
-            return game.new_phase(Phase.lights_out_rotate)
+            return game.new_phase(Phase.rotate_discovered_tile)
 
-        new_player_status = game.players[game.turn]
+        player_status5 = g5.players[game.turn]
 
-        if new_player_status.falling:
-            game = game.new_phase(Phase.fall_direction)
+        if player_status5.pos is None:
+            raise GameRuntimeError('player without pos')
 
-            game = self._activate_monsters(game, monsters)
-
-            return game
-
-        if new_player_status.has_light:
-            game = game.relight_near_players(new_player_status)
-
-        else:
-            game = game.relight_me(new_player_status)
-
-            new_player_status = game.players[game.turn]
-
-        if new_player_status.pos is None:
-            raise GameRuntimeError('moved player lost pos')
-
-        # monsters.check(new_player_status.pos)
-
-        game = self._activate_monsters(game, monsters)
-
-        cells = game.board.visible_cells_from(new_player_status.pos)
+        cells = game.board.visible_cells_from(player_status5.pos)
 
         if any(cell.tile is None for cell in cells):
-            return game.new_phase(Phase.discover_tiles)
+            return game.push_phase(Phase.discover_tiles)
+
+        if player_status5.nerves > 0:
+            return g5.add_decision(Decision(player_status.color, MoveType.crawl, 1))
+
+        if g5.final_flickers():
+            return g5.new_phase(Phase.final_flickers)
 
         return game.set_turn((game.turn + 1) % len(game.players))
+
+    def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
+        """
+        TODO return from discover tiles, falling or place_monster
+        """
 
 
 class PlaceMonster(PhaseLogic):
