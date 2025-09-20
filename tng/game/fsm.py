@@ -196,8 +196,106 @@ class RotateDiscoveredTile(PhaseLogic):
 
 
 class Landing(PhaseLogic):
+    """
+    Landing phase: the player is falling and must land on a tile.
+    See page 10 of the manual for details.
+    """
+
+    @override
+    def land(self, game: Game, player: PlayerColor, move: Land) -> Game:
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        if not player_status.falling:
+            # this is actually a game runtime error because
+            # we can be on landing phase only if the player is falling
+            raise IllegalMove('non falling player')
+
+        if player_status.fall_direction is None:
+            raise GameRuntimeError('falling player without fall direction')
+
+        if player_status.pos is None:
+            raise GameRuntimeError('falling player without position')
+
+        if move.place < 0 or move.place >= game.board.edge_length:
+            raise IllegalMove('out of bounds')
+
+        match player_status.fall_direction:
+            case FallDirection.row:
+                destination = Position(move.place, player_status.pos.y)
+            case FallDirection.column:
+                destination = Position(player_status.pos.x, move.place)
+
+        cell = game.board.at(destination)
+
+        if cell.tile is not None and (
+            any(
+                game.board.at(Position(ccrow, player_status.pos.y)).tile is None
+                for ccrow in range(game.board.edge_length)
+            )
+            if player_status.fall_direction is FallDirection.column
+            else any(
+                game.board.at(Position(player_status.pos.x, cccol)).tile is None
+                for cccol in range(game.board.edge_length)
+            )
+        ):
+            raise IllegalMove('tile not empty')
+
+        if cell.tile is not None:
+            drawn_tile = cell.tile
+
+            g1 = game.move_player(game.turn, destination)
+
+        elif game.final_flickers():
+            return game.new_phase(Phase.game_lost)
 
         else:
+            drawn_tile = game.tile_holder[game.draw_index]
+
+            g1 = (
+                game.draw_tile()
+                .place_tile(destination, drawn_tile)
+                .move_player(game.turn, destination)
+            )
+
+        if is_monster[drawn_tile]:
+            monsters = AttackingMonsters(g1.board)
+
+            attacked_players_colors = monsters.trigger_monsters(destination)
+
+            for player in attacked_players_colors:
+                player_status = g1.player_status(player)
+
+                if player_status.nerves > 0:
+                    g1 = g1.add_decision(
+                        Decision(player, MoveType.block, 1),
+                    )
+
+            if g1.decisions:
+                return g1
+
+            # TODO
+
+        elif drawn_tile in (Tile.t_passage,):
+            return g1.push_phase(
+                Phase.rotate_discovered_tile
+            )  # TODO: verify that rotation includes discovering
+
+        elif any(empty):
+            # TODO: force rotation for straight passage
+
+            return g1.push_phase(Phase.discover_tiles)
+
+        return g1.new_phase(Phase.move_player)
+
+    def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
+        """
+        TODO: either returning from discovery or from monster
+        """
+
+
 class MovePlayer(PhaseLogic):
     def stay(self, game: Game, player: PlayerColor, move: Stay) -> Game:
         player_status = game.players[game.turn]
