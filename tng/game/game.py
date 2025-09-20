@@ -451,5 +451,7 @@ class Game(NamedTuple):
 
         return self._replace(players=new_players)
 
-    def add_decision(self, phase: Phase, decision: Decision) -> 'Game':
-        return self._replace(phase=phase, decisions=(self.decisions or []) + [decision])
+    def add_decision(self, decision: Decision) -> 'Game':
+        return self._replace(
+            decisions=[decision] if not self.decisions else [*self.decisions, decision]
+        )
