@@ -710,3 +710,29 @@ def check_falling(game: Game, player_status: Player) -> tuple[Game, bool]:
         ), True
 
     return game, False  # .set_turn(turn=(game.turn + 1) % len(game.players))
+def enlighted_cells(game: Game) -> set[Position]:
+    visible_cells: set[Position] = set()
+
+    for player_status in game.players:
+        if player_status.pos is None:
+            continue
+
+        visible_cells.add(player_status.pos)
+
+        if not player_status.has_light:
+            continue
+
+        visible_cells.update(game.board.visible_cells_coords_from(player_status.pos))
+
+    return visible_cells
+
+
+def refresh_lighting(game: Game) -> Game:
+    cells = enlighted_cells(game)
+
+    return game.drop_tiles(
+        Position(x, y)
+        for x in range(game.board.edge_length)
+        for y in range(game.board.edge_length)
+        if Position(x, y) not in cells
+    )
