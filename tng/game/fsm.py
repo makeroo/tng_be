@@ -365,6 +365,32 @@ class PlaceMonster(PhaseLogic):
 
 
 class Falling(PhaseLogic):
+    @override
+    def fall(self, game: Game, player: PlayerColor, move: Fall) -> Game:
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        if not player_status.falling:
+            raise IllegalMove('non falling player')
+
+        if player_status.fall_direction is not None:
+            raise IllegalMove('already has fall direction')
+
+        if player_status.pos is None:
+            raise GameRuntimeError('falling player without position')
+
+        if move.direction not in (FallDirection.row, FallDirection.column):
+            raise IllegalMove('illegal fall direction')
+
+        raise SubphaseComplete(
+            game.fall_direction(game.turn, move.direction)
+            # .set_turn(turn=(game.turn + 1) % len(game.players))
+            # .new_phase(Phase.move_player)
+        )
+
+
 # class TriggerMonsters(PhaseLogic):
 #     pass
 
