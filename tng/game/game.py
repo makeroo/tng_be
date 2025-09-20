@@ -240,7 +240,22 @@ class Game(NamedTuple):
         )
 
     def move_player(self, player_idx: int, pos: Position) -> 'Game':
+        """
+        Updates:
+         * player status:
+            * new position or falling status
+         * collect key if any
+         * left tile into pit if it was a crumbling one
+
+        NOTE: enlightening is calc later by FSM
+        """
+
         player_status = self.players[player_idx]
+
+        starting_pos = player_status.pos
+
+        if starting_pos is None:
+            raise GameRuntimeError('moving player without pos')
 
         new_player_status = player_status._replace(pos=pos, falling=False, fall_direction=None)
 
@@ -256,19 +271,29 @@ class Game(NamedTuple):
         else:
             board_pos = new_player_status.pos
 
+        starting_tile = self.board.at(starting_pos).tile
+
+        if starting_tile is None:
+            raise GameRuntimeError('player moving from empty cell')
+
+        if is_crumbling[starting_tile]:
+            new_board = self.board.place_tile(starting_pos, Tile.pit)
+        else:
+            new_board = self.board
+
         new_players = list(self.players)
 
         new_players[player_idx] = new_player_status
 
-        new_game = self._replace(
+        return self._replace(
             players=new_players,
-            board=self.board.move_player(player_status.color, player_status.pos, board_pos),
+            board=new_board.move_player(player_status.color, player_status.pos, board_pos),
         )
 
-        if player_status.pos is None:
-            return new_game
+        # if player_status.pos is None:
+        #     return new_game
 
-        return new_game._drop_tiles(player_status.pos, player_status.has_light)
+        # return new_game._drop_tiles(player_status.pos, player_status.has_light)
 
     def change_nerves(self, player_idx: int, delta: int) -> 'Game':
         player_status = self.players[player_idx]
@@ -281,6 +306,16 @@ class Game(NamedTuple):
         return self._replace(players=new_players)
 
     def player_falls(self, player_idx: int) -> 'Game':
+        """
+        Updates:
+        * player status:
+           * falling True
+           * pos None
+        * remove player from board
+
+        NOTE: enlightening is calc later by FSM
+        """
+
         player_status = self.players[player_idx]
 
         new_player_status = player_status._replace(falling=True)
@@ -290,15 +325,15 @@ class Game(NamedTuple):
 
         new_board = self.board.move_player(player_status.color, player_status.pos, None)
 
-        new_game = self._replace(
+        return self._replace(
             board=new_board,
             players=new_players,
         )
 
-        if player_status.pos is None:
-            raise GameRuntimeError('player not placed')
+        # if player_status.pos is None:
+        #     raise GameRuntimeError('player not placed')
 
-        return new_game._drop_tiles(player_status.pos, player_status.has_light)
+        # return new_game._drop_tiles(player_status.pos, player_status.has_light)
 
     def relight_near_players(self, player_status: Player) -> 'Game':
         if player_status.pos is None:
@@ -373,22 +408,7 @@ class Game(NamedTuple):
         for cell in self.board.visible_cells_from(pos):
             yield from map(self.player_status, cell.players)
 
-    def _drop_tiles(self, pos: Position, has_light: bool) -> 'Game':
-        enlighten_cells = [pos]
-
-        if has_light:
-            enlighten_cells.extend(self.board.visible_cells_coords_from(pos))
-
-        # not on the first and term in the lambda: a connected tile may be empty
-        # when falling because the crumbled tile may have few open directions
-        # then a pit (that has all the four of them)
-
-        dropped_tiles = filter(
-            lambda cell_coords: self.board.at(cell_coords).tile is not None
-            and not self.is_enlightened(cell_coords),
-            enlighten_cells,
-        )
-
+    def drop_tiles(self, dropped_tiles: Iterable[Position]) -> 'Game':
         new_board = self.board.drop_tiles(dropped_tiles)
 
         return self._replace(board=new_board)
