@@ -169,18 +169,26 @@ class Player(NamedTuple):
 
 class Phase(Enum):
     place_start = 'place_start'
-    rotate_start = 'rotate_start'
-    discover_start_tiles = 'discover_start_tiles'
-    rotate_discovered_start_tile = 'rotate_discovered_start_tile'
-    move_player = 'move_player'
-    place_monster = 'place_monster'
+
+    # discovery sub phases
+    rotate_placed = 'rotate_placed'
     discover_tiles = 'discover_tiles'
     rotate_discovered_tile = 'rotate_discovered_tile'
-    fall_direction = 'fall_direction'
-    drop_on_tile = 'drop_on_tile'
-    replace_monster = 'replace_monster'
+
+    landing = 'landing'
+
+    move_player = 'move_player'
+    place_monster = 'place_monster'  # when staying and drawing a monster
+    # pits_form = 'pits_form'
+    falling = 'falling'  # select either row or column
+    # trigger_monsters = 'monster_attack'  # was monster_attack
+    # hit_by_monsters = 'hit_by_monsters'
+    # light_and_darkness = 'light_and_darkness'
+    # hurry_up = 'hurry_up'
+    final_flickers = 'final_flickers'
     game_lost = 'game_lost'
     game_won = 'game_won'
+
 
 class Decision(NamedTuple):
     player: PlayerColor
