@@ -179,12 +179,7 @@ class Phase(Enum):
 
     move_player = 'move_player'
     place_monster = 'place_monster'  # when staying and drawing a monster
-    # pits_form = 'pits_form'
     falling = 'falling'  # select either row or column
-    # trigger_monsters = 'monster_attack'  # was monster_attack
-    # hit_by_monsters = 'hit_by_monsters'
-    # light_and_darkness = 'light_and_darkness'
-    # hurry_up = 'hurry_up'
     final_flickers = 'final_flickers'
     game_lost = 'game_lost'
     game_won = 'game_won'

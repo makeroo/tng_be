@@ -454,10 +454,6 @@ class PlaceMonster(PhaseLogic):
     pass
 
 
-# class PitsForm(PhaseLogic):
-#     pass
-
-
 class Falling(PhaseLogic):
     @override
     def fall(self, game: Game, player: PlayerColor, move: Fall) -> Game:
@@ -536,12 +532,7 @@ class TNGFSM:
             Phase.landing: Landing(),
             Phase.move_player: MovePlayer(),
             Phase.place_monster: PlaceMonster(),
-            # Phase.pits_form: PitsForm(),
             Phase.falling: Falling(),
-            # Phase.trigger_monsters: TriggerMonsters(),
-            # Phase.hit_by_monsters: HitByMonsters(),
-            # Phase.light_and_darkness: LightAndDarkness(),
-            # Phase.hurry_up: HurryUp(),
             Phase.final_flickers: FinalFlickers(),
             Phase.game_lost: GameLost(),
             Phase.game_won: GameWon(),
