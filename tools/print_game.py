@@ -185,7 +185,7 @@ def print_game(game: Game) -> str:
 
     p = game.players[game.turn]
 
-    turn = f'\nturn: {getattr(Colors, p.color.value)}{p.color.value}{Colors.end}, phase: {game.phase.value}'
+    turn = f'\nturn: {getattr(Colors, p.color.value)}{p.color.value}{Colors.end}, phase: {game.phases[-1].value}'
     tiles = f'\nremaining tiles: {len(game.tile_holder) - game.draw_index}'
 
     return (
