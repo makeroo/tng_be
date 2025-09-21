@@ -14,13 +14,11 @@ class MoveType(str, Enum):
     fall = "fall"  # select either row or column
     land = "land"  # return on board
     # charge = "charge"  # move into a monster
-    # spend_nerve = "spend_nerve"
     discard_tile = "discard_tile"  # last action of the turn during the final flickers
 
     # decisions
     pass_key = "pass_key"
     block = "block"  # drop just 2 tiles instead of three, spending 1 nerve
-    sustain = "sustain"  # don't drop any tiles during the final flickers
     move_again = "move_again"
 
 
@@ -63,7 +61,7 @@ class Land(BaseModel):
 
 class DiscardTile(BaseModel):
     move: Literal[MoveType.discard_tile]
-    pos: Position
+    pos: Position | None  # use None to sustain
 
 
 class PassKey(BaseModel):
@@ -73,10 +71,6 @@ class PassKey(BaseModel):
 
 class Block(BaseModel):
     move: Literal[MoveType.block]
-
-
-class Sustain(BaseModel):
-    move: Literal[MoveType.sustain]
 
 
 class MoveAgain(BaseModel):
@@ -95,6 +89,5 @@ class Move(BaseModel):
         | DiscardTile
         | PassKey
         | Block
-        | Sustain
         | MoveAgain
     ) = Field(discriminator='move')

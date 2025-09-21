@@ -18,7 +18,6 @@ from .moves import (
     Fall,
     Land,
     PassKey,
-    Sustain,
     Block,
     MoveAgain,
     DiscardTile,
@@ -70,9 +69,6 @@ class PhaseLogic:
         raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
 
     def block(self, game: Game, player: PlayerColor, move: Block) -> Game:
-        raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
-
-    def sustain(self, game: Game, player: PlayerColor, move: Sustain) -> Game:
         raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
 
     def move_again(self, game: Game, player: PlayerColor, move: MoveAgain) -> Game:
@@ -489,24 +485,37 @@ class Falling(PhaseLogic):
         )
 
 
-# class TriggerMonsters(PhaseLogic):
-#     pass
-
-
-# class HitByMonsters(PhaseLogic):
-#     pass
-
-
-# class LightAndDarkness(PhaseLogic):
-#     pass
-
-
-# class HurryUp(PhaseLogic):
-#     pass
-
-
 class FinalFlickers(PhaseLogic):
-    pass
+    @override
+    def discard_tile(self, game: Game, player: PlayerColor, move: DiscardTile) -> Game:
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        if not game.final_flickers():
+            raise IllegalMove('not in final flickers')
+
+        if move.pos is not None:
+            cell = game.board.at(move.pos)
+
+            if cell.tile is None:
+                raise IllegalMove('empty cell')
+
+            if len(cell.players) > 0:
+                raise IllegalMove('cell occupied')
+
+        elif player_status.nerves == 0:
+            raise IllegalMove('no nerves, must discard a tile')
+
+        # apply
+
+        if move.pos is not None:
+            g1 = game.place_tile(move.pos, Tile.pit)
+        else:
+            g1 = game.change_nerves(game.turn, -1)
+
+        return g1.set_turn((game.turn + 1) % len(game.players))
 
 
 class GameWon(PhaseLogic):
