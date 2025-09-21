@@ -462,7 +462,7 @@ class PlaceMonster(PhaseLogic):
 
         monster_tile = game.tile_holder[game.draw_index - 1]
 
-        # TODO; if player is in lights out, the monster disappears soon. We can either:
+        # TODO: if player is in lights out, the monster disappears soon. We can either:
         # 1. discard it
         # 2. place it and then remove it after activation check (if the playuer falls)
         # right now we do 2.
