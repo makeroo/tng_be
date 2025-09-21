@@ -451,7 +451,25 @@ class MovePlayer(PhaseLogic):
 
 
 class PlaceMonster(PhaseLogic):
-    pass
+    @override
+    def place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
+        player_status = game.players[game.turn]
+
+        if player_status.color != player:
+            raise IllegalMove('not player turn')
+
+        # apply
+
+        monster_tile = game.tile_holder[game.draw_index - 1]
+
+        # TODO; if player is in lights out, the monster disappears soon. We can either:
+        # 1. discard it
+        # 2. place it and then remove it after activation check (if the playuer falls)
+        # right now we do 2.
+
+        g1 = apply_place_tile(game, player, move, monster_tile, replace_allowed=True)
+
+        raise SubphaseComplete(g1)
 
 
 class Falling(PhaseLogic):
@@ -563,20 +581,6 @@ class TNGFSM:
         logic = self.phases[g1.current_phase]
 
         return logic.sub_phase_complete(g1, move.player, move.param)
-
-    # def place_monster_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
-    #     player_status = game.players[game.turn]
-
-    #     if player_status.color != player:
-    #         raise IllegalMove('not player turn')
-
-    #     # apply
-
-    #     monster_tile = game.tile_holder[game.draw_index - 1]
-
-    #     new_game = self._apply_place_tile(game, player, move, monster_tile, replace_allowed=True)
-
-    #     return check_falling(new_game, player_status)
 
     # def discover_tiles_place_tile(self, game: Game, player: PlayerColor, move: PlaceTile) -> Game:
     #     # validate
