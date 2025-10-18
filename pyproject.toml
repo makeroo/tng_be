@@ -1,0 +1,21 @@
+[project]
+name = "tng-be"
+dynamic = ["version"]
+description = "TNG backend"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic>=2.11.9",
+]
+
+[tool.setuptools.packages.find]
+include = ["tng.be*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "tng.be.VERSION" }
+
+[tool.uv]
+package = true
+
+[project.scripts]
+tng-be = "tng.be.app:main"
