@@ -57,7 +57,7 @@ def test_rotate_start_rotate_tile():
     assert game3.board.at(Position(3, 4)).players == [PlayerColor.blue]
     assert game3.board.at(Position(3, 4)).direction == Direction.e
     assert game3.players[0].pos == Position(3, 4)
-    assert game3.phase == Phase.discover_start_tiles
+    assert game3.phases[-1] == Phase.discover_tiles
 
 
 def test_rotate_discovered_start_tile_rotate_tile():
@@ -100,7 +100,7 @@ def test_rotate_discovered_start_tile_rotate_tile():
     assert game4.players[0].pos == Position(3, 4)
     assert game4.last_placed_tile_pos == Position(3, 3)
     assert game4.draw_index == 1
-    assert game4.phase == Phase.rotate_discovered_start_tile
+    assert game4.phases[-1] == Phase.rotate_discovered_tile
     assert game4.board.at(Position(3, 3)).tile is Tile.straight_passage
 
     game5 = fsm.apply(
@@ -111,7 +111,7 @@ def test_rotate_discovered_start_tile_rotate_tile():
         ),
     )
 
-    assert game5.phase == Phase.discover_start_tiles
+    assert game5.phases[-1] == Phase.discover_tiles
     assert game5.board.at(Position(3, 3)).direction == Direction.s
     assert game5.board.at(Position(3, 4)).players == [PlayerColor.blue]
     assert game5.players[0].pos == Position(3, 4)
