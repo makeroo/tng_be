@@ -8,11 +8,6 @@ class AttackingMonsters:
     def __init__(self, board: Board) -> None:
         self.board = board
 
-        # self.triggered_monsters: dict[Position, Cell] = {}
-        # self.visited_coords: set[Position] = set()
-
-        # self.hitten_cells: dict[Position, list[Tile]] = {}
-
     def trigger_monsters(self, player_moved_from: Position) -> dict[PlayerColor, list[Cell]]:
         """
         Look for monsters in the cell the player moved from and in any direction from it.
