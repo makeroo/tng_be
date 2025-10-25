@@ -361,6 +361,8 @@ class Game(NamedTuple):
         if new_player_status.pos is None:
             return new_game
 
+        # TODO: optimize, refresh visible cells after having processed all attacks
+
         dropped_tiles: list[Position] = []
 
         for p in new_game.board.visible_cells_coords_from(new_player_status.pos):
