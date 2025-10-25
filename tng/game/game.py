@@ -188,7 +188,7 @@ class Phase(Enum):
 class Decision(NamedTuple):
     player: PlayerColor
     action: MoveType
-    order: int
+    # order: int
 
 
 class Game(NamedTuple):

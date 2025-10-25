@@ -400,7 +400,7 @@ class MovePlayer(PhaseLogic):
                 # f/e pov both actions (nerves and moving) are to be taken
                 # at once, therefore I use this mechanism on the b/e
                 g3.add_decision(
-                    Decision(player_status.color, MoveType.crawl, 2),
+                    Decision(player_status.color, MoveType.crawl),
                 )
 
         else:
@@ -437,7 +437,7 @@ class MovePlayer(PhaseLogic):
             return game.push_phase(Phase.discover_tiles)
 
         if player_status5.nerves > 0:
-            return g5.add_decision(Decision(player_status.color, MoveType.crawl, 1))
+            return g5.add_decision(Decision(player_status.color, MoveType.crawl))
 
         if g5.final_flickers():
             return g5.new_phase(Phase.final_flickers)
@@ -785,7 +785,7 @@ def monster_attack(game: Game, monster: Tile, player_status: Player) -> Game:
     if monster == Tile.wax_eater:
         if player_status.nerves > 0:
             return game.add_decision(
-                Decision(player_status.color, MoveType.block, 1),
+                Decision(player_status.color, MoveType.block),
             )
 
         else:
