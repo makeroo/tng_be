@@ -29,8 +29,6 @@ from .monsters import AttackingMonsters
 
 # TODO: check that game has ended
 
-# TODO: move again (spend 1 nerve to move again)
-
 
 class IllegalMove(ValueError):
     pass
@@ -137,8 +135,6 @@ class DiscoverTiles(PhaseLogic):
         if game.final_flickers():
             raise IllegalMove('final flickers')
 
-        # this is the start macro phase, there is no need
-        # to check for bounds: there are surely tiles to draw
         placed_tile = game.tile_holder[game.draw_index]
 
         g1 = apply_place_tile(game, player, move, placed_tile, replace_allowed=False)
