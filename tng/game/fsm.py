@@ -141,13 +141,8 @@ class DiscoverTiles(PhaseLogic):
 
         g2 = g1.draw_tile()
 
-        # FIXME: if there is one only available rotation force that and skip rotate_discovered_start_title phase
-
-        if placed_tile in (Tile.t_passage, Tile.straight_passage):
+        if placed_tile == Tile.t_passage:
             return g2.new_phase(Phase.rotate_discovered_tile)
-        if placed_tile == Tile.straight_passage:
-            # TODO: calc correct direction and place it accordingly
-            pass
 
         start_pos = g2.players[g2.turn].pos
 
@@ -721,7 +716,19 @@ def apply_place_tile(
 
     # apply
 
-    return game.place_tile(move.pos, tile, Direction.n)
+    if player_status.pos is not None and tile == Tile.straight_passage:
+        # force correct direction
+        open_dirs = game.board.at(player_status.pos).open_directions()
+
+        if Direction.n in open_dirs or Direction.s in open_dirs:
+            dir = Direction.n
+        else:
+            dir = Direction.e
+
+    else:
+        dir = Direction.n
+
+    return game.place_tile(move.pos, tile, dir)
 
 
 def next_from_discover_tiles(game: Game, start_pos: Position) -> Game:
