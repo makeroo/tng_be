@@ -154,7 +154,7 @@ class DiscoverTiles(PhaseLogic):
         if start_pos is None:
             raise GameRuntimeError('current player without pos')
 
-        return next_from_discover_tiles(game, start_pos)
+        return next_from_discover_tiles(g2, start_pos)
 
 
 class RotateDiscoveredTile(PhaseLogic):
