@@ -261,27 +261,19 @@ class Landing(PhaseLogic):
 
             attacked_players_colors = monsters.trigger_monsters(destination)
 
-            for player in attacked_players_colors:
-                player_status = g1.player_status(player)
+            g2 = activate_monsters(g1, attacked_players_colors)
 
-                if player_status.nerves > 0:
-                    g1 = g1.add_decision(
-                        Decision(player, MoveType.block, 1),
-                    )
+            g3 = g2.add_decision(Decision(player, MoveType.crawl))
 
-            if g1.decisions:
-                return g1
+            return g3
 
-            # TODO
+        if drawn_tile in (Tile.t_passage, Tile.straight_passage):
+            # note: there is no constraint that forces the rotation
+            # so that the straight is aligned to an already placed tile
 
-        elif drawn_tile in (Tile.t_passage,):
-            return g1.push_phase(
-                Phase.rotate_discovered_tile
-            )  # TODO: verify that rotation includes discovering
+            return g1.push_phase(Phase.rotate_discovered_tile)
 
-        elif any(empty):
-            # TODO: force rotation for straight passage
-
+        if any(cell.tile is None for cell in g1.board.visible_cells_from(destination)):
             return g1.push_phase(Phase.discover_tiles)
 
         return g1.new_phase(Phase.move_player)
