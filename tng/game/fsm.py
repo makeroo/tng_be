@@ -307,7 +307,10 @@ class MovePlayer(PhaseLogic):
         if is_monster[drawn_tile]:
             return g2.push_phase(Phase.place_monster)
 
-        g3, fallen = check_falling(game, player_status)
+        g3, fallen = check_falling(g2, player_status)
+
+        if g3.players[g3.turn].nerves > 0:
+            return g3.add_decision(Decision(player_status.color, MoveType.optional_movement))
 
         if g3.final_flickers():
             if fallen:
