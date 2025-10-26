@@ -271,31 +271,7 @@ class Landing(PhaseLogic):
         return g1.new_phase(Phase.move_player)
 
     def block(self, game: Game, player: PlayerColor, move: Block) -> Game:
-        '''
-        This is a decision, check if there is one.
-        If so and the player decided to spent a nerve just discard 2 tiles instead of 3.
-        '''
-
-        # validate
-
-        d, g1 = game.discard_decision(player)
-
-        if d.action != MoveType.block:
-            raise IllegalMove(f'unexpected decision: player={player}, move={MoveType.block}')
-
-        player_status = g1.player_status(player)
-
-        if move.block and player_status.nerves < 1:
-            raise IllegalMove(f'can\'t block, no nerves to spend: player={player}')
-
-        # apply
-
-        if move.block:
-            g2 = g1.change_nerves(g1.player_idx(player), -1).draw_tiles(2)
-        else:
-            g2 = g1.draw_tiles(3)
-
-        return g2
+        return block(game, player, move)
     def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
         """
         TODO: either returning from discovery or from monster
@@ -457,6 +433,8 @@ class MovePlayer(PhaseLogic):
 
         return g5.set_turn((g5.turn + 1) % len(g5.players))
 
+    def block(self, game: Game, player: PlayerColor, move: Block) -> Game:
+        return block(game, player, move)
     def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
         """
         TODO return from discover tiles, falling or place_monster
@@ -846,3 +824,31 @@ def refresh_lighting(game: Game) -> Game:
         for y in range(game.board.edge_length)
         if Position(x, y) not in cells
     )
+
+
+def block(game: Game, player: PlayerColor, move: Block) -> Game:
+    '''
+    This is a decision, check if there is one.
+    If so and the player decided to spent a nerve just discard 2 tiles instead of 3.
+    '''
+
+    # validate
+
+    d, g1 = game.discard_decision(player)
+
+    if d.action != MoveType.block:
+        raise IllegalMove(f'unexpected decision: player={player}, move={MoveType.block}')
+
+    player_status = g1.player_status(player)
+
+    if move.block and player_status.nerves < 1:
+        raise IllegalMove(f'can\'t block, no nerves to spend: player={player}')
+
+    # apply
+
+    if move.block:
+        g2 = g1.change_nerves(g1.player_idx(player), -1).draw_tiles(2)
+    else:
+        g2 = g1.draw_tiles(3)
+
+    return g2
