@@ -363,6 +363,7 @@ class Game(NamedTuple):
             return new_game
 
         # TODO: optimize, refresh visible cells after having processed all attacks
+        # note: there is refresh_enlightment function to do so
 
         dropped_tiles: list[Position] = []
 
