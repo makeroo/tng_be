@@ -36,6 +36,7 @@ from .types import (
     is_crumbling,
 )
 from .moves import MoveType
+from .exc import IllegalMove
 
 
 class GameRuntimeError(Exception):
