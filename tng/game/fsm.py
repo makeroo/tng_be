@@ -26,13 +26,10 @@ from .moves import (
 )
 from .types import PlayerColor, Tile, Direction, is_monster, FallDirection, Position, is_crumbling
 from .monsters import AttackingMonsters
+from .exc import IllegalMove
 
 
 # TODO: check that game has ended
-
-
-class IllegalMove(ValueError):
-    pass
 
 
 class SubphaseComplete(Exception):

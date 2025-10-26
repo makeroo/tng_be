@@ -1,0 +1,2 @@
+class IllegalMove(ValueError):
+    pass
