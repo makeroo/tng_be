@@ -452,3 +452,15 @@ class Game(NamedTuple):
         return self._replace(
             decisions=[decision] if not self.decisions else [*self.decisions, decision]
         )
+
+    def discard_decision(self, player: PlayerColor) -> tuple[Decision, 'Game']:
+        if not self.decisions:
+            raise IllegalMove(f'decision not found: player={player}')
+
+        for d in self.decisions:
+            if d.player == player:
+                new_dd = [x for x in self.decisions if x is not d]
+
+                return d, self._replace(decisions=new_dd)
+
+        raise IllegalMove(f'decision not found: player={player}')
