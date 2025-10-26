@@ -417,7 +417,7 @@ class MovePlayer(PhaseLogic):
 
         cells = g5.board.visible_cells_from(player_status5.pos)
 
-        if any(cell.tile is None for cell in cells):
+        if any(cell.tile is None for cell in cells) and not g5.final_flickers():
             return g5.push_phase(Phase.discover_tiles)
 
         if player_status5.nerves > 0:
