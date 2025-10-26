@@ -451,7 +451,7 @@ class PlaceMonster(PhaseLogic):
 
         # TODO: if player is in lights out, the monster disappears soon. We can either:
         # 1. discard it
-        # 2. place it and then remove it after activation check (if the playuer falls)
+        # 2. place it and then remove it after activation check (if the player falls)
         # right now we do 2.
 
         g1 = apply_place_tile(game, player, move, monster_tile, replace_allowed=True)
