@@ -300,7 +300,7 @@ class MovePlayer(PhaseLogic):
         else:
             g1 = game
 
-        drawn_tile = g1.tile_holder[game.draw_index]
+        drawn_tile = g1.tile_holder[g1.draw_index]
 
         g2 = g1.draw_tile()
 
@@ -408,17 +408,17 @@ class MovePlayer(PhaseLogic):
         g5 = refresh_lighting(g4)
 
         if drawn_tile in [Tile.t_passage, Tile.straight_passage]:
-            return game.new_phase(Phase.rotate_discovered_tile)
+            return g5.new_phase(Phase.rotate_discovered_tile)
 
-        player_status5 = g5.players[game.turn]
+        player_status5 = g5.players[g5.turn]
 
         if player_status5.pos is None:
             raise GameRuntimeError('player without pos')
 
-        cells = game.board.visible_cells_from(player_status5.pos)
+        cells = g5.board.visible_cells_from(player_status5.pos)
 
         if any(cell.tile is None for cell in cells):
-            return game.push_phase(Phase.discover_tiles)
+            return g5.push_phase(Phase.discover_tiles)
 
         if player_status5.nerves > 0:
             return g5.add_decision(Decision(player_status.color, MoveType.optional_movement))
@@ -426,7 +426,7 @@ class MovePlayer(PhaseLogic):
         if g5.final_flickers():
             return g5.new_phase(Phase.final_flickers)
 
-        return game.set_turn((game.turn + 1) % len(game.players))
+        return g5.set_turn((g5.turn + 1) % len(g5.players))
 
     def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
         """
