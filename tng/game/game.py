@@ -449,6 +449,9 @@ class Game(NamedTuple):
         return self._replace(players=new_players)
 
     def add_decision(self, decision: Decision) -> 'Game':
+        if decision.action not in (MoveType.block, MoveType.block, MoveType.optional_movement):
+            raise GameRuntimeError(f'unsupported decison action: action={decision.action}')
+
         return self._replace(
             decisions=[decision] if not self.decisions else [*self.decisions, decision]
         )
