@@ -272,6 +272,12 @@ class Landing(PhaseLogic):
 
     def block(self, game: Game, player: PlayerColor, move: Block) -> Game:
         return block(game, player, move)
+
+    def crawl(self, game: Game, player: PlayerColor, move: Crawl) -> Game:
+        '''
+        TODO: landed on monster
+        '''
+
     def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
         """
         TODO: either returning from discovery or from monster
@@ -326,6 +332,8 @@ class MovePlayer(PhaseLogic):
 
     def crawl(self, game: Game, player: PlayerColor, move: Crawl) -> Game:
         # validate move
+
+        # TODO: check if crawl'ed on monster in lights out move in response to a Decision
 
         player_status = game.players[game.turn]
 
@@ -435,6 +443,12 @@ class MovePlayer(PhaseLogic):
 
     def block(self, game: Game, player: PlayerColor, move: Block) -> Game:
         return block(game, player, move)
+
+    def optional_movement(self, game: Game, player: PlayerColor, move: OptionalMovement) -> Game:
+        '''
+        TODO prepare game for a new stay/crawl move
+        '''
+
     def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
         """
         TODO return from discover tiles, falling or place_monster
