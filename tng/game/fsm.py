@@ -15,6 +15,7 @@ from .moves import (
     RotateTile,
     Stay,
     Crawl,
+    OptionalMovement,
     Fall,
     Land,
     PassKey,
@@ -52,6 +53,9 @@ class PhaseLogic:
         raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
 
     def crawl(self, game: Game, player: PlayerColor, move: Crawl) -> Game:
+        raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
+
+    def optional_movement(self, game: Game, player: PlayerColor, move: OptionalMovement) -> Game:
         raise IllegalMove(f'illegal move {move} in phase {game.current_phase}')
 
     def fall(self, game: Game, player: PlayerColor, move: Fall) -> Game:
@@ -420,7 +424,7 @@ class MovePlayer(PhaseLogic):
             return game.push_phase(Phase.discover_tiles)
 
         if player_status5.nerves > 0:
-            return g5.add_decision(Decision(player_status.color, MoveType.crawl))
+            return g5.add_decision(Decision(player_status.color, MoveType.optional_movement))
 
         if g5.final_flickers():
             return g5.new_phase(Phase.final_flickers)

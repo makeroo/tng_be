@@ -11,6 +11,7 @@ class MoveType(str, Enum):
     rotate_tile = "rotate_tile"
     stay = "stay"
     crawl = "crawl"
+    optional_movement = "optional_movement"  # to move again if desidered (and nerves available)
     fall = "fall"  # select either row or column
     land = "land"  # return on board
     # charge = "charge"  # move into a monster
@@ -49,6 +50,11 @@ class Crawl(BaseModel):
     direction: Direction
 
 
+class OptionalMovement(BaseModel):
+    move: Literal[MoveType.optional_movement]
+    move_again: bool
+
+
 class Fall(BaseModel):
     move: Literal[MoveType.fall]
     direction: FallDirection
@@ -84,6 +90,7 @@ class Move(BaseModel):
         | RotateTile
         | Stay
         | Crawl
+        | OptionalMovement
         | Fall
         | Land
         | DiscardTile
