@@ -77,6 +77,7 @@ class PassKey(BaseModel):
 
 class Block(BaseModel):
     move: Literal[MoveType.block]
+    block: bool
 
 
 class MoveAgain(BaseModel):
