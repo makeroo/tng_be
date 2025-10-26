@@ -437,6 +437,13 @@ class Game(NamedTuple):
 
         raise GameRuntimeError('player not found')
 
+    def player_idx(self, player: PlayerColor) -> int:
+        for idx, p in enumerate(self.players):
+            if p.color == player:
+                return idx
+
+        raise GameRuntimeError('player not found')
+
     def fall_direction(self, player_idx: int, direction: FallDirection) -> 'Game':
         player_status = self.players[player_idx]
 
