@@ -919,6 +919,10 @@ def apply_crawl(game: Game, dest_pos: Position, player_cell: Cell, dest_cell: Ce
     if player_status5.nerves > 0:
         return g5.add_decision(Decision(player_status.color, MoveType.optional_movement))
 
+    if g5.decisions:
+        # can happen when moving due to a decision
+        return g5
+
     if g5.final_flickers():
         return g5.new_phase(Phase.final_flickers)
 
