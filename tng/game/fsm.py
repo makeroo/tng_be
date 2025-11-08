@@ -428,8 +428,37 @@ class MovePlayer(PhaseLogic):
 
     def optional_movement(self, game: Game, player: PlayerColor, move: OptionalMovement) -> Game:
         '''
-        TODO prepare game for a new stay/crawl move
+        Prepare game for a new stay/crawl move
         '''
+
+        g1 = game.discard_decision(player, MoveType.optional_movement)
+
+        player_idx = g1.player_idx(player)
+
+        if player_idx != g1.turn:
+            raise GameRuntimeError('the choosing player should be the moving one')
+
+        player_status = g1.players[g1.turn]
+
+        if move.move_again and player_status.nerves == 0:
+            raise IllegalMove('no nerves to move again')
+
+        # apply
+
+        if move.move_again:
+            g2 = g1.change_nerves(g1.turn, -1)
+
+            if not g2.decisions:
+                return g2
+
+            # TODO: save decision somewhere
+
+            return g3
+
+        if g1.decisions:
+            return g1
+
+        return g1.set_turn((game.turn + 1) % len(game.players))
 
     def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
         """
