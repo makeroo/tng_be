@@ -325,8 +325,23 @@ class Landing(PhaseLogic):
 
     def sub_phase_complete(self, game: Game, player: PlayerColor, move: Move) -> Game:
         """
-        TODO: either returning from discovery or from monster
+        Either returning from discovery or from monster
         """
+
+        player_idx = game.player_idx(player)
+
+        if player_idx != game.turn:
+            raise GameRuntimeError('mismatching continuation player')
+
+        player_status = game.players[game.turn]
+
+        if player_status.pos is None:
+            raise GameRuntimeError('player without pos')
+
+        if any(cell.tile is None for cell in game.board.visible_cells_from(player_status.pos)):
+            return game.push_phase(Phase.discover_tiles)
+
+        return game.new_phase(Phase.move_player)
 
 
 class MovePlayer(PhaseLogic):
